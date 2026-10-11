@@ -2581,8 +2581,8 @@ private struct MinimalQuotaRow: View {
                 .foregroundStyle(.kimiTextSecondary)
                 .frame(width: 20, alignment: labelAlignment)
 
-            // 百分比：固定宽度，保证两行进度条起点一致；
-            // 38pt 刚好容纳 13pt 粗体 Rounded 的「100%」（32pt 会截断成「10…」）
+            // 百分比：最小宽度 38pt 保证两行进度条起点对齐，
+            // 内容更宽时（如「100%」）自适应撑开，fixedSize 杜绝截断省略号
             Group {
                 if !isLoading {
                     if percentage != nil {
@@ -2600,7 +2600,9 @@ private struct MinimalQuotaRow: View {
                         .frame(width: 12, height: 12)
                 }
             }
-            .frame(width: 38, alignment: .leading)
+            .lineLimit(1)
+            .fixedSize()
+            .frame(minWidth: 38, alignment: .leading)
 
             // 进度条
             GeometryReader { proxy in
