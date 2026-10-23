@@ -1868,23 +1868,23 @@ private struct DeepSeekBalanceCard: View {
     }
 }
 
-/// 手机号复制 chip：悬停手型 + 高亮反馈，点击复制手机号到剪贴板，
-/// 复制后短暂显示「已复制」。用于 WorkBuddy 多账号快速区分与批量重登时取用号码。
+/// 手机号复制 chip：悬停手型 + 高亮反馈，点击时短暂按压效果并复制手机号到剪贴板。
+/// 用于 WorkBuddy 多账号快速区分与批量重登时取用号码。
 private struct PhoneCopyChip: View {
     let phone: String
 
     @StateObject private var languageManager = LanguageManager.shared
     @State private var isHovered = false
-    @State private var didCopy = false
+    @State private var isPressed = false
 
     var body: some View {
-        Text(didCopy ? languageManager.tr("已复制") : phone)
+        Text(phone)
             .font(.system(size: 11, weight: .medium))
             .monospacedDigit()
             .foregroundStyle(isHovered ? .kimiTextPrimary : .kimiTextTertiary)
             .padding(.horizontal, 5)
             .padding(.vertical, 1)
-            .background(Color.kimiTextPrimary.opacity(isHovered ? 0.12 : 0.05))
+            .background(Color.kimiTextPrimary.opacity(isPressed ? 0.2 : (isHovered ? 0.12 : 0.05)))
             .clipShape(RoundedRectangle(cornerRadius: 4))
             .cursor(.pointingHand)
             .onHover { isHovered = $0 }
@@ -1892,9 +1892,10 @@ private struct PhoneCopyChip: View {
             .onTapGesture {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(phone, forType: .string)
-                didCopy = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    didCopy = false
+                // 点击反馈：短暂加深底色，不改变文字
+                isPressed = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    isPressed = false
                 }
             }
             .fixedSize()
