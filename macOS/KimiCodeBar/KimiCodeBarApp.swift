@@ -1943,16 +1943,15 @@ private struct WorkBuddyCard: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 16, height: 16)
 
-            // 账号名 + 备注手机号（手机号 chip 悬停手型、点击复制）
-            HStack(spacing: 6) {
-                Text(model.displayName(for: account))
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.kimiTextSecondary)
-                    .lineLimit(1)
+            // 账号名（弹性宽度，空间不足时省略号截断）
+            Text(model.displayName(for: account))
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.kimiTextSecondary)
+                .lineLimit(1)
 
-                if let phone = account.phone?.trimmingCharacters(in: .whitespacesAndNewlines), !phone.isEmpty {
-                    PhoneCopyChip(phone: phone)
-                }
+            // 备注手机号 chip：固定完整展示，悬停手型、点击复制
+            if let phone = account.phone?.trimmingCharacters(in: .whitespacesAndNewlines), !phone.isEmpty {
+                PhoneCopyChip(phone: phone)
             }
 
             // 标签：仅展示「当前」
