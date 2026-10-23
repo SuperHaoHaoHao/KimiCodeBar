@@ -88,6 +88,7 @@ struct AccountsSettingsView: View {
                                     draggingAccountID: $draggingAccountID,
                                     displayName: model.displayName(for: account),
                                     provider: account.provider,
+                                    phone: account.phone,
                                     credential: account.credential,
                                     isPrimary: account.id == model.primaryAccountID,
                                     isCliActive: account.id == model.cliActiveAccountID,
@@ -756,6 +757,8 @@ private struct AccountRow: View {
     @Binding var draggingAccountID: UUID?
     let displayName: String
     let provider: AccountProvider
+    /// 备注手机号（仅 WorkBuddy 账号使用）：非空时紧跟昵称显示完整号码，便于快速核对
+    let phone: String?
     let credential: AccountCredential
     let isPrimary: Bool
     let isCliActive: Bool
@@ -865,6 +868,16 @@ private struct AccountRow: View {
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.kimiTextPrimary)
                     .lineLimit(1)
+
+                // WorkBuddy 账号：昵称后显示完整备注手机号，便于快速核对当前配置
+                if provider == .workbuddy,
+                   let trimmed = phone?.trimmingCharacters(in: .whitespacesAndNewlines),
+                   !trimmed.isEmpty {
+                    Text(trimmed)
+                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .foregroundStyle(.kimiTextTertiary)
+                        .lineLimit(1)
+                }
 
                 // API Key 账号：脱敏 Key 紧跟名称后，不支持显隐切换
                 if !isOAuth, let masked = maskedApiKey {
