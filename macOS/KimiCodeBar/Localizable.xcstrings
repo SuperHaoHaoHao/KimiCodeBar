@@ -3560,6 +3560,28 @@
           }
         }
       }
+    },
+    "已复制到剪贴板" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied to clipboard"
+          }
+        }
+      }
+    },
+    "今日未签到" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not checked in today"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

@@ -1868,37 +1868,47 @@ private struct DeepSeekBalanceCard: View {
     }
 }
 
-/// 手机号复制 chip：悬停手型 + 高亮反馈，点击时短暂按压效果并复制手机号到剪贴板。
-/// 用于 WorkBuddy 多账号快速区分与批量重登时取用号码。
-private struct PhoneCopyChip: View {
+/// 手机号复制按钮：手机图标替代号码文本（节省面板宽度），悬停手型 + 高亮反馈，
+/// 点击复制手机号到剪贴板，并在图标上方弹出轻提示「已复制到剪贴板」。
+private struct PhoneCopyIcon: View {
     let phone: String
 
     @StateObject private var languageManager = LanguageManager.shared
     @State private var isHovered = false
-    @State private var isPressed = false
+    @State private var showToast = false
 
     var body: some View {
-        Text(phone)
-            .font(.system(size: 11, weight: .medium))
-            .monospacedDigit()
+        Image(systemName: "phone.fill")
+            .font(.system(size: 10, weight: .medium))
             .foregroundStyle(isHovered ? .kimiTextPrimary : .kimiTextTertiary)
-            .padding(.horizontal, 5)
-            .padding(.vertical, 1)
-            .background(Color.kimiTextPrimary.opacity(isPressed ? 0.2 : (isHovered ? 0.12 : 0.05)))
+            .frame(width: 18, height: 18)
+            .background(Color.kimiTextPrimary.opacity(isHovered ? 0.12 : 0.05))
             .clipShape(RoundedRectangle(cornerRadius: 4))
             .cursor(.pointingHand)
             .onHover { isHovered = $0 }
             .help(languageManager.tr("点击复制手机号"))
+            .overlay(alignment: .top) {
+                if showToast {
+                    Text(languageManager.tr("已复制到剪贴板"))
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.black.opacity(0.85))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .fixedSize()
+                        .offset(y: -32)
+                        .transition(.opacity.combined(with: .move(edge: .bottom)))
+                }
+            }
             .onTapGesture {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(phone, forType: .string)
-                // 点击反馈：短暂加深底色，不改变文字
-                isPressed = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    isPressed = false
+                withAnimation(.easeInOut(duration: 0.15)) { showToast = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                    withAnimation(.easeInOut(duration: 0.2)) { showToast = false }
                 }
             }
-            .fixedSize()
     }
 }
 
@@ -1935,6 +1945,11 @@ private struct WorkBuddyCard: View {
         model.workBuddyActiveUID == account.workBuddyCredential?.uid
     }
 
+    /// 今日是否已签到
+    private var isCheckedInToday: Bool {
+        model.accountCheckinDates[account.id] == WorkBuddyService.todayString()
+    }
+
     var body: some View {
         HStack(spacing: 8) {
             // 左：WorkBuddy 小 logo
@@ -1944,15 +1959,22 @@ private struct WorkBuddyCard: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 16, height: 16)
 
-            // 账号名（弹性宽度，空间不足时省略号截断）
+            // 账号名（完整展示，优先占用空间；空间不足时压缩右侧积分而不是名字）
             Text(model.displayName(for: account))
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(.kimiTextSecondary)
                 .lineLimit(1)
+                .layoutPriority(1)
 
-            // 备注手机号 chip：固定完整展示，悬停手型、点击复制
+            // 签到状态图标：今日已签到 ✓（绿），未签到 ✕（灰）
+            Image(systemName: isCheckedInToday ? "checkmark.circle.fill" : "xmark.circle.fill")
+                .font(.system(size: 11))
+                .foregroundStyle(isCheckedInToday ? .green : .kimiTextTertiary)
+                .help(languageManager.tr(isCheckedInToday ? "已签到" : "今日未签到"))
+
+            // 备注手机号：手机图标，点击复制并弹轻提示
             if let phone = account.phone?.trimmingCharacters(in: .whitespacesAndNewlines), !phone.isEmpty {
-                PhoneCopyChip(phone: phone)
+                PhoneCopyIcon(phone: phone)
             }
 
             // 标签：仅展示「当前」
