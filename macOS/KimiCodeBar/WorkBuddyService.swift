@@ -417,6 +417,20 @@ final class WorkBuddyService {
 
     // MARK: - 构建请求
 
+    /// 本机安装的 WorkBuddy.app 版本号，用于客户端身份头；取不到时兜底。
+    /// 2026-10-23 起服务端对 billing/meter 接口强制校验客户端身份（缺失返回 403
+    /// code=10085「请求不合法」，表现为一池账号全部「登录失效」），身份值需与官方客户端一致。
+    private static let workBuddyIdentityVersion: String = {
+        let url = URL(fileURLWithPath: "/Applications/WorkBuddy.app/Contents/Info.plist")
+        guard let data = try? Data(contentsOf: url),
+              let info = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
+              let version = info["CFBundleShortVersionString"] as? String,
+              !version.isEmpty else {
+            return "5.8.3"
+        }
+        return version
+    }()
+
     private func makeRequest(path: String, cred: WorkBuddyCredential) -> URLRequest {
         let url = URL(string: baseURL + path)!
         var req = URLRequest(url: url)
@@ -425,11 +439,19 @@ final class WorkBuddyService {
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.setValue("application/json", forHTTPHeaderField: "Accept")
 
+        // 客户端身份头：与官方客户端保持一致，缺失会被服务端判为「请求不合法」(403/10085)
+        req.setValue("WorkBuddy", forHTTPHeaderField: "X-IDE-Type")
+        req.setValue("WorkBuddy", forHTTPHeaderField: "X-IDE-Name")
+        req.setValue(Self.workBuddyIdentityVersion, forHTTPHeaderField: "X-IDE-Version")
+        req.setValue("SaaS", forHTTPHeaderField: "X-Product")
+        req.setValue("XMLHttpRequest", forHTTPHeaderField: "x-requested-with")
+        req.setValue("1", forHTTPHeaderField: "x-codebuddy-request")
+        req.setValue("WorkBuddy/\(Self.workBuddyIdentityVersion)", forHTTPHeaderField: "User-Agent")
+
         if !cred.isApiKeyMode {
             req.setValue(cred.uid, forHTTPHeaderField: "X-User-Id")
             req.setValue(cred.domain, forHTTPHeaderField: "X-Domain")
             req.setValue("zh-CN,zh;q=0.9", forHTTPHeaderField: "Accept-Language")
-            req.setValue("Mozilla/5.0", forHTTPHeaderField: "User-Agent")
         }
         req.httpBody = "{}".data(using: .utf8)
         return req
