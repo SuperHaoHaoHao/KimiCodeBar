@@ -46,7 +46,6 @@ final class WorkBuddyService {
 
     private let session: URLSession
     private let baseURL = "https://copilot.tencent.com"
-    private let refreshURL = "https://www.codebuddy.cn/auth/realms/copilot/protocol/openid-connect/token"
 
     /// WorkBuddy 控制台（用量 / 套餐页），底部「控制台」按钮跳转入口
     static let consoleURL = URL(string: "https://www.workbuddy.cn/profile/plans-usage")!
@@ -312,45 +311,54 @@ final class WorkBuddyService {
 
     /// 查询指定账号的剩余积分 + 套餐名。
     /// 返回 WorkBuddyFetchOutcome 让调用方区分 401 失效 / 网络错误 / 正常成功三种状态。
-    /// Token 快过期时自动刷新（refresh_token grant 在 console client 上禁用，
-    /// 实际很少触发；服务端 SSO session 失效时返回 .unauthorized 让 UI 引导重登）。
+    /// Token 快过期或闲置超 5 天时自动换新（保活，防止服务端重置长期不活动的会话）；
+    /// 请求被 401/403 拒绝时用官方刷新端点重放一次再判定。
     func fetchCredits(account: KimiAccount) async -> WorkBuddyFetchOutcome {
         guard var cred = account.workBuddyCredential else {
             return .failed("账号凭证缺失")
         }
 
-        if isTokenExpiringSoon(cred.accessToken) {
-            if let refreshed = await refreshToken(cred: cred) {
-                cred = refreshed
-                KimiAccountStore.shared.updateWorkBuddyCredential(id: account.id, credential: refreshed)
-            } else {
-                // refresh_token grant 被 Keycloak 后台禁用，refresh 必然失败；
-                // 这种情况按 unauthorized 处理（实际更可能是 access_token 已被服务端吊销）
+        var didRetryAfterRefresh = false
+        while true {
+            if isTokenExpiringSoon(cred.accessToken) || isTokenStale(cred.accessToken) {
+                if let refreshed = await refreshToken(cred: cred) {
+                    cred = refreshed
+                    KimiAccountStore.shared.updateWorkBuddyCredential(id: account.id, credential: refreshed)
+                } else if isTokenExpiringSoon(cred.accessToken) {
+                    // 临近过期还刷不动，按 unauthorized 处理
+                    return .unauthorized
+                }
+            }
+
+            let request = makeRequest(path: "/v2/billing/meter/get-user-resource", cred: cred)
+            let data: Data
+            let http: HTTPURLResponse
+            do {
+                let (rawData, response) = try await session.data(for: request)
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    return .failed("服务端响应格式异常")
+                }
+                data = rawData
+                http = httpResponse
+            } catch {
+                return .failed("网络错误：\(error.localizedDescription)")
+            }
+
+            // 401/403 = SSO session 失效（access_token JWT 没过期但服务端 session 表里查不到 sid）。
+            // 会话仍存活但 token 被拒时，官方刷新端点重放一次即可恢复；
+            // 会话已被服务端重置（refresh 返回 12153）时刷新必然失败，按 unauthorized 处理。
+            if http.statusCode == 401 || http.statusCode == 403 {
+                if !didRetryAfterRefresh, let refreshed = await refreshToken(cred: cred) {
+                    didRetryAfterRefresh = true
+                    cred = refreshed
+                    KimiAccountStore.shared.updateWorkBuddyCredential(id: account.id, credential: refreshed)
+                    continue
+                }
                 return .unauthorized
             }
-        }
-
-        let request = makeRequest(path: "/v2/billing/meter/get-user-resource", cred: cred)
-        let data: Data
-        let http: HTTPURLResponse
-        do {
-            let (rawData, response) = try await session.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse else {
-                return .failed("服务端响应格式异常")
+            if http.statusCode != 200 {
+                return .failed("HTTP \(http.statusCode)")
             }
-            data = rawData
-            http = httpResponse
-        } catch {
-            return .failed("网络错误：\(error.localizedDescription)")
-        }
-
-        // 401/403 = SSO session 失效（access_token JWT 没过期但服务端 session 表里查不到 sid）
-        if http.statusCode == 401 || http.statusCode == 403 {
-            return .unauthorized
-        }
-        if http.statusCode != 200 {
-            return .failed("HTTP \(http.statusCode)")
-        }
 
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let code = (json["code"] as? NSNumber)?.intValue ?? (json["code"] as? Int) else {
@@ -392,23 +400,39 @@ final class WorkBuddyService {
         }
 
         return .success(WorkBuddyCredits(remaining: total, tier: simplifyTier(tierName)))
+        } // while true
     }
 
     // MARK: - 刷新 Token
 
+    /// 官方刷新端点（与桌面客户端一致）：POST /v2/plugin/auth/token/refresh，
+    /// refreshToken 走 X-Refresh-Token 头。Keycloak 原生 refresh_token grant
+    /// 在 console client 上已被服务端禁用（unauthorized_client），必须走此通道。
+    /// 注意：服务端每次都会轮换 refreshToken，成功后需用新 token 对覆盖本地存储——
+    /// 旧 refreshToken 随轮换作废，不保存新对会导致账号无法续期。
+    /// 会话已被服务端重置时刷新返回 12153（refresh token issued before the user
+    /// session started），这种情况只能重新登录，与社区方案（workbuddy-checkin /
+    /// workbuddy-switch）的处理一致。
     func refreshToken(cred: WorkBuddyCredential) async -> WorkBuddyCredential? {
         guard !cred.refreshToken.isEmpty else { return nil }
-        var req = URLRequest(url: URL(string: refreshURL)!)
+        var req = URLRequest(url: URL(string: baseURL + "/v2/plugin/auth/token/refresh")!)
         req.httpMethod = "POST"
-        req.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        req.httpBody = "grant_type=refresh_token&refresh_token=\(cred.refreshToken)&client_id=console".data(using: .utf8)
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.setValue("application/json", forHTTPHeaderField: "Accept")
+        req.setValue("Bearer \(cred.accessToken)", forHTTPHeaderField: "Authorization")
+        req.setValue(cred.domain, forHTTPHeaderField: "X-Domain")
+        req.setValue(cred.refreshToken, forHTTPHeaderField: "X-Refresh-Token")
+        req.setValue("plugin", forHTTPHeaderField: "X-Auth-Refresh-Source")
+        Self.applyIdentityHeaders(to: &req)
+        req.httpBody = "{}".data(using: .utf8)
 
         guard let (data, _) = try? await session.data(for: req),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let newAT = json["access_token"] as? String else {
+              let d = json["data"] as? [String: Any],
+              let newAT = d["accessToken"] as? String else {
             return nil
         }
-        let newRT = json["refresh_token"] as? String ?? cred.refreshToken
+        let newRT = d["refreshToken"] as? String ?? cred.refreshToken
         var refreshed = cred
         refreshed.accessToken = newAT
         refreshed.refreshToken = newRT
@@ -431,6 +455,17 @@ final class WorkBuddyService {
         return version
     }()
 
+    /// 客户端身份头：与官方客户端保持一致，缺失会被服务端判为「请求不合法」(403/10085)
+    private static func applyIdentityHeaders(to req: inout URLRequest) {
+        req.setValue("WorkBuddy", forHTTPHeaderField: "X-IDE-Type")
+        req.setValue("WorkBuddy", forHTTPHeaderField: "X-IDE-Name")
+        req.setValue(workBuddyIdentityVersion, forHTTPHeaderField: "X-IDE-Version")
+        req.setValue("SaaS", forHTTPHeaderField: "X-Product")
+        req.setValue("XMLHttpRequest", forHTTPHeaderField: "x-requested-with")
+        req.setValue("1", forHTTPHeaderField: "x-codebuddy-request")
+        req.setValue("WorkBuddy/\(workBuddyIdentityVersion)", forHTTPHeaderField: "User-Agent")
+    }
+
     private func makeRequest(path: String, cred: WorkBuddyCredential) -> URLRequest {
         let url = URL(string: baseURL + path)!
         var req = URLRequest(url: url)
@@ -438,15 +473,7 @@ final class WorkBuddyService {
         req.setValue("Bearer \(cred.accessToken)", forHTTPHeaderField: "Authorization")
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        // 客户端身份头：与官方客户端保持一致，缺失会被服务端判为「请求不合法」(403/10085)
-        req.setValue("WorkBuddy", forHTTPHeaderField: "X-IDE-Type")
-        req.setValue("WorkBuddy", forHTTPHeaderField: "X-IDE-Name")
-        req.setValue(Self.workBuddyIdentityVersion, forHTTPHeaderField: "X-IDE-Version")
-        req.setValue("SaaS", forHTTPHeaderField: "X-Product")
-        req.setValue("XMLHttpRequest", forHTTPHeaderField: "x-requested-with")
-        req.setValue("1", forHTTPHeaderField: "x-codebuddy-request")
-        req.setValue("WorkBuddy/\(Self.workBuddyIdentityVersion)", forHTTPHeaderField: "User-Agent")
+        Self.applyIdentityHeaders(to: &req)
 
         if !cred.isApiKeyMode {
             req.setValue(cred.uid, forHTTPHeaderField: "X-User-Id")
@@ -574,6 +601,15 @@ final class WorkBuddyService {
     private func isTokenExpiringSoon(_ token: String, withinHours hours: Double = 1) -> Bool {
         guard let expiry = tokenExpiryDate(token) else { return true }
         return expiry.timeIntervalSinceNow < hours * 3600
+    }
+
+    /// access token 签发是否超过 maxAgeDays 天。服务端会重置长期不活动的会话
+    /// （表现为网关 401 / refresh 12153），参考社区方案（workbuddy-switch 每日保活、
+    /// workbuddy-checkin 过期前 24h 预刷新）做定期保活刷新，token 换新后 iat 刷新，
+    /// 实际间隔约为 maxAgeDays 天一次。
+    private func isTokenStale(_ token: String, maxAgeDays: Double = 5) -> Bool {
+        guard let iat = decodeJWTPayload(token)?["iat"] as? Double else { return false }
+        return Date().timeIntervalSince1970 - iat > maxAgeDays * 86400
     }
 
     private func tokenExpiryDate(_ token: String) -> Date? {
