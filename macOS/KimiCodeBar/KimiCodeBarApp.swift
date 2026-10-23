@@ -1934,11 +1934,6 @@ private struct WorkBuddyCard: View {
         model.workBuddyActiveUID == account.workBuddyCredential?.uid
     }
 
-    /// 今日是否已签到
-    private var isCheckedInToday: Bool {
-        model.accountCheckinDates[account.id] == WorkBuddyService.todayString()
-    }
-
     var body: some View {
         HStack(spacing: 8) {
             // 左：WorkBuddy 小 logo
@@ -1954,12 +1949,6 @@ private struct WorkBuddyCard: View {
                 .foregroundStyle(.kimiTextSecondary)
                 .lineLimit(1)
                 .layoutPriority(1)
-
-            // 签到状态图标：今日已签到 ✓（绿），未签到 ✕（灰）
-            Image(systemName: isCheckedInToday ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .font(.system(size: 11))
-                .foregroundStyle(isCheckedInToday ? .green : .kimiTextTertiary)
-                .help(languageManager.tr(isCheckedInToday ? "已签到" : "今日未签到"))
 
             // 备注手机号：手机图标，点击复制并弹轻提示
             if let phone = account.phone?.trimmingCharacters(in: .whitespacesAndNewlines), !phone.isEmpty {
