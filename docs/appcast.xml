@@ -3,12 +3,12 @@
     <channel>
         <title>KimiCodeBar</title>
         <item>
-            <title>1.7.1</title>
-            <pubDate>Sat, 10 Oct 2026 12:06:13 +0000</pubDate>
-            <sparkle:version>1.7.1</sparkle:version>
-            <sparkle:shortVersionString>1.7.1</sparkle:shortVersionString>
+            <title>1.7.2</title>
+            <pubDate>Fri, 23 Oct 2026 04:25:20 +0000</pubDate>
+            <sparkle:version>1.7.2</sparkle:version>
+            <sparkle:shortVersionString>1.7.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/xifandev/KimiCodeBar/releases/download/v1.7.1/KimiCodeBar-1.7.1-sparkle-update.zip" length="4117512" type="application/octet-stream" sparkle:edSignature="wxzl5CRv0AagU9ahzVBXGHdDw6DWjsxbHNDaOQOPe0aGQb7QSldn/lM49qQrXQRHRJ442mCL8zp91KyjKkHxAQ=="/>
+            <enclosure url="https://github.com/xifandev/KimiCodeBar/releases/download/v1.7.2/KimiCodeBar-1.7.2-sparkle-update.zip" length="4121338" type="application/octet-stream" sparkle:edSignature="KvAkikV4nB/uTj/lO+tRMYmFiqwk4RyxRuAjILRP72bBuGfiaDSN+awI4iEH7LNplUAtI38RKm6Y2vAo61wXDg=="/>
         <sparkle:releaseNotesLink>https://xifandev.github.io/KimiCodeBar/release-notes.html</sparkle:releaseNotesLink>
         </item>
     </channel>
