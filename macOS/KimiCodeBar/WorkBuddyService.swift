@@ -311,7 +311,7 @@ final class WorkBuddyService {
 
     /// 查询指定账号的剩余积分 + 套餐名。
     /// 返回 WorkBuddyFetchOutcome 让调用方区分 401 失效 / 网络错误 / 正常成功三种状态。
-    /// Token 快过期或闲置超 5 天时自动换新（保活，防止服务端重置长期不活动的会话）；
+    /// Token 快过期或签发超 1 天时自动换新（每日保活，防止服务端清理会话）；
     /// 请求被 401/403 拒绝时用官方刷新端点重放一次再判定。
     func fetchCredits(account: KimiAccount) async -> WorkBuddyFetchOutcome {
         guard var cred = account.workBuddyCredential else {
@@ -603,11 +603,11 @@ final class WorkBuddyService {
         return expiry.timeIntervalSinceNow < hours * 3600
     }
 
-    /// access token 签发是否超过 maxAgeDays 天。服务端会重置长期不活动的会话
-    /// （表现为网关 401 / refresh 12153），参考社区方案（workbuddy-switch 每日保活、
-    /// workbuddy-checkin 过期前 24h 预刷新）做定期保活刷新，token 换新后 iat 刷新，
-    /// 实际间隔约为 maxAgeDays 天一次。
-    private func isTokenStale(_ token: String, maxAgeDays: Double = 5) -> Bool {
+    /// access token 签发是否超过 maxAgeDays 天。服务端不定期清理/重置会话（表现为
+    /// 网关 401 / refresh 12153），实测被官方客户端使用过的会话更容易存活，因此用
+    /// 官方刷新端点定期保活（社区方案 workbuddy-switch 每日保活 / workbuddy-checkin
+    /// 过期前 24h 预刷新，同思路）。token 换新后 iat 刷新，实际间隔约为 maxAgeDays 天一次。
+    private func isTokenStale(_ token: String, maxAgeDays: Double = 1) -> Bool {
         guard let iat = decodeJWTPayload(token)?["iat"] as? Double else { return false }
         return Date().timeIntervalSince1970 - iat > maxAgeDays * 86400
     }
