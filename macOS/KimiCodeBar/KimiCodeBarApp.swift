@@ -1878,8 +1878,8 @@ private struct PhoneCopyIcon: View {
     @State private var showToast = false
 
     var body: some View {
-        Image(systemName: "phone.fill")
-            .font(.system(size: 10, weight: .medium))
+        Image(systemName: "iphone")
+            .font(.system(size: 11, weight: .medium))
             .foregroundStyle(isHovered ? .kimiTextPrimary : .kimiTextTertiary)
             .frame(width: 18, height: 18)
             .background(Color.kimiTextPrimary.opacity(isHovered ? 0.12 : 0.05))
