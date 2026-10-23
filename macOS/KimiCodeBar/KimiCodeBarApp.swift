@@ -1,7 +1,6 @@
 import SwiftUI
 import AppKit
 import ServiceManagement
-import UserNotifications
 import Darwin
 
 // MARK: - 主题
@@ -101,7 +100,7 @@ struct KimiCodeBarApp: App {
     @StateObject private var themeManager = ThemeManager.shared
 
     init() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
+        // 不弹系统通知（含通知权限申请），新版本只在面板版本行静默提示
         NSApplication.shared.appearance = ThemeManager.shared.theme.nsAppearance
         _ = SparkleUpdater.shared
     }
@@ -6829,7 +6828,7 @@ final class KimiCodeBarModel: ObservableObject {
     }
 
     func checkForKimiCLIUpdate() async {
-        // 关闭检查更新时直接返回（双保险：拦联网 + 弹窗 + 系统通知，sendUpdateNotification 在此函数内调用）
+        // 关闭检查更新时直接返回（拦联网 + 面板版本行提示；不发系统通知）
         guard enableKimiCLIUpdateCheck else { return }
         guard !isCheckingUpdate else { return }
         await MainActor.run {
@@ -6875,13 +6874,12 @@ final class KimiCodeBarModel: ObservableObject {
                     return
                 }
 
-                // 避免重复通知：只有首次发现该版本时才发送通知
+                // 只有首次发现该版本时才更新待更新状态（不发系统通知，避免打扰用户）
                 if pendingUpdateVersion != latest {
                     pendingUpdateVersion = latest
                     cachedKimiReleaseNotes = notes ?? ""
                     pendingReleaseNotes = notes
                     snoozedKimiUpdateUntil = 0
-                    sendUpdateNotification(version: latest)
                 }
             } else {
                 // 本地已经是最新版，清空待更新状态和延迟记录
@@ -6978,20 +6976,6 @@ final class KimiCodeBarModel: ObservableObject {
             ignoredAppUpdateVersion = version
         }
         pendingAppUpdateVersion = nil
-    }
-
-    private func sendUpdateNotification(version: String) {
-        let content = UNMutableNotificationContent()
-        content.title = LanguageManager.tr("KimiCode 有新版本")
-        content.body = LanguageManager.tr("KimiCode %@ 已发布，点击更新。", arguments: [version])
-        content.sound = .default
-
-        let request = UNNotificationRequest(
-            identifier: "kimi-code-update-\(version)",
-            content: content,
-            trigger: nil
-        )
-        UNUserNotificationCenter.current().add(request)
     }
 
     private func detectKimiCLIVersion() async -> String {
