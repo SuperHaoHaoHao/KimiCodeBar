@@ -1869,13 +1869,14 @@ private struct DeepSeekBalanceCard: View {
 }
 
 /// 手机号复制按钮：手机图标替代号码文本（节省面板宽度），悬停手型 + 高亮反馈，
-/// 点击复制手机号到剪贴板，并在图标上方弹出轻提示「已复制到剪贴板」。
+/// 点击复制手机号到剪贴板，并通过 copiedToast 通知卡片弹出轻提示（气泡由卡片统一
+/// 渲染在卡片内右侧，避免被卡片 clipShape 裁掉）。
 private struct PhoneCopyIcon: View {
     let phone: String
+    @Binding var copiedToast: Bool
 
     @StateObject private var languageManager = LanguageManager.shared
     @State private var isHovered = false
-    @State private var showToast = false
 
     var body: some View {
         Image(systemName: "iphone")
@@ -1887,26 +1888,12 @@ private struct PhoneCopyIcon: View {
             .cursor(.pointingHand)
             .onHover { isHovered = $0 }
             .help(languageManager.tr("点击复制手机号"))
-            .overlay(alignment: .top) {
-                if showToast {
-                    Text(languageManager.tr("已复制到剪贴板"))
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.black.opacity(0.85))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .fixedSize()
-                        .offset(y: -32)
-                        .transition(.opacity.combined(with: .move(edge: .bottom)))
-                }
-            }
             .onTapGesture {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(phone, forType: .string)
-                withAnimation(.easeInOut(duration: 0.15)) { showToast = true }
+                withAnimation(.easeInOut(duration: 0.15)) { copiedToast = true }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                    withAnimation(.easeInOut(duration: 0.2)) { showToast = false }
+                    withAnimation(.easeInOut(duration: 0.2)) { copiedToast = false }
                 }
             }
     }
@@ -1926,6 +1913,8 @@ private struct WorkBuddyCard: View {
     @StateObject private var languageManager = LanguageManager.shared
 
     @State private var isHoveredLaunch = false
+    /// 复制手机号的轻提示（由卡片级 overlay 渲染，避免被卡片圆角裁剪）
+    @State private var showCopiedToast = false
 
     private var credits: WorkBuddyCredits? {
         model.accountWorkBuddyCredits[account.id]
@@ -1974,7 +1963,7 @@ private struct WorkBuddyCard: View {
 
             // 备注手机号：手机图标，点击复制并弹轻提示
             if let phone = account.phone?.trimmingCharacters(in: .whitespacesAndNewlines), !phone.isEmpty {
-                PhoneCopyIcon(phone: phone)
+                PhoneCopyIcon(phone: phone, copiedToast: $showCopiedToast)
             }
 
             // 标签：仅展示「当前」
@@ -2038,6 +2027,21 @@ private struct WorkBuddyCard: View {
         .padding(.vertical, 12)
         .background(Color.kimiCardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        // 复制轻提示：渲染在卡片级 overlay（位于 clipShape 之外，不会被圆角裁掉），
+        // 盖在积分区上方，1.2 秒自动消失
+        .overlay(alignment: .trailing) {
+            if showCopiedToast {
+                Text(languageManager.tr("已复制到剪贴板"))
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.black.opacity(0.85))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .padding(.trailing, 44)
+                    .transition(.opacity.combined(with: .move(edge: .trailing)))
+            }
+        }
     }
 
     private func tagPill(_ text: String, color: Color) -> some View {
