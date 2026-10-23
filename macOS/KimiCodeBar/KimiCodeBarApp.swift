@@ -1868,6 +1868,39 @@ private struct DeepSeekBalanceCard: View {
     }
 }
 
+/// 手机号复制 chip：悬停手型 + 高亮反馈，点击复制手机号到剪贴板，
+/// 复制后短暂显示「已复制」。用于 WorkBuddy 多账号快速区分与批量重登时取用号码。
+private struct PhoneCopyChip: View {
+    let phone: String
+
+    @StateObject private var languageManager = LanguageManager.shared
+    @State private var isHovered = false
+    @State private var didCopy = false
+
+    var body: some View {
+        Text(didCopy ? languageManager.tr("已复制") : phone)
+            .font(.system(size: 11, weight: .medium))
+            .monospacedDigit()
+            .foregroundStyle(isHovered ? .kimiTextPrimary : .kimiTextTertiary)
+            .padding(.horizontal, 5)
+            .padding(.vertical, 1)
+            .background(Color.kimiTextPrimary.opacity(isHovered ? 0.12 : 0.05))
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .cursor(.pointingHand)
+            .onHover { isHovered = $0 }
+            .help(languageManager.tr("点击复制手机号"))
+            .onTapGesture {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(phone, forType: .string)
+                didCopy = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    didCopy = false
+                }
+            }
+            .fixedSize()
+    }
+}
+
 // MARK: - WorkBuddy 积分卡片
 
 /// WorkBuddy 积分卡片：极简单行布局，与 DeepSeek 卡同款节奏。
@@ -1901,11 +1934,6 @@ private struct WorkBuddyCard: View {
         model.workBuddyActiveUID == account.workBuddyCredential?.uid
     }
 
-    /// 今日是否已签到
-    private var isCheckedInToday: Bool {
-        model.accountCheckinDates[account.id] == WorkBuddyService.todayString()
-    }
-
     var body: some View {
         HStack(spacing: 8) {
             // 左：WorkBuddy 小 logo
@@ -1915,18 +1943,21 @@ private struct WorkBuddyCard: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 16, height: 16)
 
-            // 账号名
-            Text(model.displayName(for: account))
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(.kimiTextSecondary)
-                .lineLimit(1)
+            // 账号名 + 备注手机号（手机号 chip 悬停手型、点击复制）
+            HStack(spacing: 6) {
+                Text(model.displayName(for: account))
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.kimiTextSecondary)
+                    .lineLimit(1)
 
-            // 标签：当前 / 已签到
+                if let phone = account.phone?.trimmingCharacters(in: .whitespacesAndNewlines), !phone.isEmpty {
+                    PhoneCopyChip(phone: phone)
+                }
+            }
+
+            // 标签：仅展示「当前」
             if isActive {
                 tagPill(languageManager.tr("当前"), color: .kimiBlue)
-            }
-            if isCheckedInToday {
-                tagPill(languageManager.tr("已签到"), color: .green)
             }
 
             Spacer(minLength: 8)
@@ -6272,6 +6303,13 @@ final class KimiCodeBarModel: ObservableObject {
     func renameAccount(_ id: UUID, alias: String?) {
         let trimmed = alias?.trimmingCharacters(in: .whitespacesAndNewlines)
         KimiAccountStore.shared.setAlias(id: id, alias: (trimmed?.isEmpty == false) ? trimmed : nil)
+        accounts = KimiAccountStore.shared.snapshot.accounts
+    }
+
+    /// 设置 WorkBuddy 账号的备注手机号（面板昵称旁展示、点击复制）；传 nil 或空白清除
+    func setAccountPhone(_ id: UUID, phone: String?) {
+        let trimmed = phone?.trimmingCharacters(in: .whitespacesAndNewlines)
+        KimiAccountStore.shared.setPhone(id: id, phone: (trimmed?.isEmpty == false) ? trimmed : nil)
         accounts = KimiAccountStore.shared.snapshot.accounts
     }
 

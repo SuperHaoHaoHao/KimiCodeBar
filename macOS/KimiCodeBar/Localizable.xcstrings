@@ -3516,6 +3516,50 @@
           }
         }
       }
+    },
+    "为该账号设置便于区分的别名和备注手机号，手机号可留空。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set an alias and phone number to tell accounts apart. Phone is optional."
+          }
+        }
+      }
+    },
+    "已复制" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied"
+          }
+        }
+      }
+    },
+    "手机号" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phone"
+          }
+        }
+      }
+    },
+    "点击复制手机号" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click to copy phone number"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

@@ -14,6 +14,8 @@ struct AccountsSettingsView: View {
     // 重命名弹窗状态
     @State private var renamingAccount: KimiAccount?
     @State private var renameText = ""
+    /// WorkBuddy 专用：重命名弹窗里的备注手机号输入
+    @State private var renamePhoneText = ""
     @State private var showRenameAlert = false
 
     // 删除确认弹窗状态
@@ -95,6 +97,7 @@ struct AccountsSettingsView: View {
                                     onSwitchCli: { requestCliSwitch(account) },
                                     onRename: {
                                         renamingAccount = account
+                                        renamePhoneText = account.phone ?? ""
                                         if let alias = account.alias?.trimmingCharacters(in: .whitespacesAndNewlines), !alias.isEmpty {
                                             renameText = alias
                                         } else {
@@ -151,14 +154,24 @@ struct AccountsSettingsView: View {
         }
         .alert(LanguageManager.tr("重命名账号"), isPresented: $showRenameAlert) {
             TextField(LanguageManager.tr("别名"), text: $renameText)
+            if renamingAccount?.provider == .workbuddy {
+                TextField(LanguageManager.tr("手机号"), text: $renamePhoneText)
+            }
             Button(LanguageManager.tr("保存")) {
                 if let account = renamingAccount {
                     model.renameAccount(account.id, alias: renameText)
+                    if account.provider == .workbuddy {
+                        model.setAccountPhone(account.id, phone: renamePhoneText)
+                    }
                 }
             }
             Button(LanguageManager.tr("取消"), role: .cancel) {}
         } message: {
-            Text(LanguageManager.tr("为该账号设置一个便于区分的别名，留空则恢复默认名称。"))
+            if renamingAccount?.provider == .workbuddy {
+                Text(LanguageManager.tr("为该账号设置便于区分的别名和备注手机号，手机号可留空。"))
+            } else {
+                Text(LanguageManager.tr("为该账号设置一个便于区分的别名，留空则恢复默认名称。"))
+            }
         }
         .alert(LanguageManager.tr("删除账号"), isPresented: $showDeleteConfirm) {
             Button(LanguageManager.tr("删除"), role: .destructive) {
