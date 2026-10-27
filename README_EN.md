@@ -1,25 +1,44 @@
 <h1 align="left" style="border-bottom: none; margin: 0">
-  <img src="Assets/logo.gif" width="55" alt="KimiCodeBar Logo" align="absmiddle">&nbsp;&nbsp;KimiCodeBar
+  <img src="Assets/logo.gif" width="55" alt="KimiCodeBar Logo" align="absmiddle">&nbsp;&nbsp;KimiCodeBar Custom Edition
 </h1>
 <p align="left">
-  <a href="https://github.com/xifandev/KimiCodeBar/releases"><img src="https://img.shields.io/badge/version-1.2.0-333333" alt="Version"></a>
+  <a href="https://github.com/SuperHaoHaoHao/KimiCodeBar/releases"><img src="https://img.shields.io/badge/version-1.7.2-333333" alt="Version"></a>
  <img src="https://img.shields.io/badge/macOS-333333?logo=apple&logoColor=white" alt="macOS">
-  <img src="https://img.shields.io/badge/-KIMI%20Community%20Edition-orange" alt="Community Edition">
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/xifandev/KimiCodeBar" alt="License"></a>
+  <img src="https://img.shields.io/badge/-Independent%20Custom%20Edition-orange" alt="Independent Custom Edition">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/SuperHaoHaoHao/KimiCodeBar" alt="License"></a>
 </p>
 
-🌐 **Website:** [https://xifandev.github.io/KimiCodeBar/](https://xifandev.github.io/KimiCodeBar/)
+[中文](README.md) | English
 
-A lightweight usage monitoring tool built for [Kimi Code](https://www.kimi.com/code). It runs quietly in your menu bar, so your quota is always at a glance!
+An **independent customized Fork** of [**xifandev/KimiCodeBar**](https://github.com/xifandev/KimiCodeBar).
+
+The original project is a lightweight menu-bar usage monitor for Kimi Code. This repository preserves the original author's technology stack, UI, interactions, and feature-design style while adding custom features, calculation logic, and internal release capabilities for personal requirements.
+
+## Fork Origin and Maintenance
+
+- **Original author and source:** Thanks to [@xifandev](https://github.com/xifandev) for open-sourcing [KimiCodeBar](https://github.com/xifandev/KimiCodeBar), which provides the starting point for this repository.
+- **Independent maintenance:** This Fork is maintained independently by [@SuperHaoHaoHao](https://github.com/SuperHaoHaoHao), and all custom changes remain here.
+- **No impact on the original project:** Changes in this repository do not modify or affect the original author's software or future iterations, and do not imply maintenance or endorsement by the original author.
+- **No automatic upstream syncing:** New upstream commits are not merged automatically. Upstream improvements may be reviewed and selectively adopted manually when needed.
+- **No upstream overwrite:** The original Sparkle update feed is disabled. This customized edition is updated by building and distributing a new DMG.
+
+🌐 **Original project website:** [https://xifandev.github.io/KimiCodeBar/](https://xifandev.github.io/KimiCodeBar/)
 
 #
 
-#### Download (macOS): <a href="https://github.com/xifandev/KimiCodeBar/releases">GitHub Releases</a>
-#### Download (Windows): <a href="https://github.com/JYH1878/KimiCodeBar-Windows/releases">GitHub Releases</a> (Maintained by @JYH1878)
+#### Custom macOS downloads: <a href="https://github.com/SuperHaoHaoHao/KimiCodeBar/releases">GitHub Releases</a>
+#### Original Windows edition: <a href="https://github.com/JYH1878/KimiCodeBar-Windows/releases">GitHub Releases</a> (Maintained by @JYH1878; not part of this customized edition)
 
-#### Feedback: <a href="https://github.com/xifandev/KimiCodeBar/issues">Issues</a>
+#### Feedback for this Fork: <a href="https://github.com/SuperHaoHaoHao/KimiCodeBar/issues">Issues</a>
 
 #
+
+## Current Customizations
+
+- Preserve the original menu-bar quota monitoring, multi-account support, usage statistics, skill management, and visual style.
+- Support Xcode development, Ad Hoc signing, and DMG packaging without a paid Apple Developer certificate.
+- Build and publish customized DMG installers through this repository's GitHub Actions for personal and internal team use.
+- Disable upstream automatic updates so future features evolve independently of the original author's releases.
 
 ### 👇 Real-time menu bar monitoring
 
@@ -45,20 +64,18 @@ Using official Kimi Code APIs, supports one-click browser authorization login. T
 
 ### 🔒 Privacy & Security
 
-All data is stored locally. APIs only communicate with official Kimi servers. The full source code is open.
+Account and statistics data stays on the local machine. Network requests are used for platform authorization, quota queries, and required official APIs. Local account data is never included in a DMG, and the source code remains open.
 
 #
 
 ### 🛠 Platform Support
 
-- macOS (Released)
-- Windows (Released, maintained by @JYH1878)
+- macOS (this customized edition)
+- Windows (not currently included in this Fork; the original Windows edition is maintained by @JYH1878)
 
 #
 
-## Independent Fork: Local Development and Releases
-
-This repository is maintained as an independent customized version. It does not automatically sync with upstream or download updates from the upstream update feed.
+## Local Development and Releases
 
 ### Run with Xcode
 
@@ -89,10 +106,12 @@ The release workflow uses neither paid certificates nor Apple notarization. If m
 
 #
 
-### Feedback 👉 <a href="https://github.com/xifandev/KimiCodeBar/issues">Issues</a>
-
-#
-
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE). You are free to use, copy, modify, and distribute this project, provided that the original copyright notice (Copyright © 2026 xifandev) and license text are retained.
+This customized edition remains under the [MIT License](LICENSE). You may use, copy, modify, and distribute it, provided that the original copyright notice and license text are retained.
+
+## 🙏 Acknowledgements
+
+- Thanks to [@xifandev](https://github.com/xifandev) for creating and open-sourcing [KimiCodeBar](https://github.com/xifandev/KimiCodeBar).
+- Thanks to [CodexBar](https://github.com/AidenYang1/CodexBar).
+- Thanks to [Kimi Code](https://github.com/MoonshotAI/kimi-code).
