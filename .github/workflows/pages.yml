@@ -1,12 +1,7 @@
 name: Deploy GitHub Pages
 
+# 独立定制版不自动发布上游网站和 appcast，仅保留手动触发入口
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'docs/**'
-      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 concurrency:

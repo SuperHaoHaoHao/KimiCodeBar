@@ -56,6 +56,39 @@ All data is stored locally. APIs only communicate with official Kimi servers. Th
 
 #
 
+## Independent Fork: Local Development and Releases
+
+This repository is maintained as an independent customized version. It does not automatically sync with upstream or download updates from the upstream update feed.
+
+### Run with Xcode
+
+```bash
+open macOS/KimiCodeBar.xcodeproj
+```
+
+Select the `KimiCodeBar` scheme and `My Mac` in Xcode, then press `Command + R`. Debug builds use Ad Hoc local signing and do not require a paid Apple Developer certificate.
+
+### Build a DMG locally
+
+```bash
+./scripts/build-local.sh
+```
+
+The installer is saved as `dist/KimiCodeBar-local-macOS.dmg`. You can also run `./scripts/build-local.sh vX.Y.Z` to set the version label in the DMG filename; this does not change the app's internal version.
+
+### Publish with GitHub
+
+After you push a `v*` version tag, GitHub Actions runs the same packaging script and uploads the DMG to this repository's Releases:
+
+```bash
+git tag vX.Y.Z
+git push origin vX.Y.Z
+```
+
+The release workflow uses neither paid certificates nor Apple notarization. If macOS blocks the app on first launch, confirm that the package came from a trusted source, then open `System Settings → Privacy & Security` and click `Open Anyway`. The DMG contains only the app and an Applications shortcut; it never includes local account data.
+
+#
+
 ### Feedback 👉 <a href="https://github.com/xifandev/KimiCodeBar/issues">Issues</a>
 
 #

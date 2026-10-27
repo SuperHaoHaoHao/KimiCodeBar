@@ -58,6 +58,39 @@
 
 #
 
+## 独立定制版：本地开发与发布
+
+本仓库作为独立定制版维护，不自动同步上游，也不会从上游更新源下载和覆盖当前版本。
+
+### 使用 Xcode 运行
+
+```bash
+open macOS/KimiCodeBar.xcodeproj
+```
+
+在 Xcode 中选择 `KimiCodeBar` scheme 和 `My Mac`，按 `Command + R` 运行。Debug 使用 Ad Hoc 本地签名，不需要付费 Apple Developer 证书。
+
+### 在本地生成 DMG
+
+```bash
+./scripts/build-local.sh
+```
+
+安装包输出到 `dist/KimiCodeBar-local-macOS.dmg`。也可以执行 `./scripts/build-local.sh vX.Y.Z` 指定安装包文件名中的版本标记；它不会修改 App 内部版本号。
+
+### 通过 GitHub 自动发布
+
+推送 `v*` 格式的版本标签后，GitHub Actions 会执行同一个打包脚本，并将 DMG 上传到当前仓库的 Releases：
+
+```bash
+git tag vX.Y.Z
+git push origin vX.Y.Z
+```
+
+发布流程不使用付费证书或 Apple 公证。同事首次打开 App 时，如果被 macOS 拦截，请确认安装包来自你，然后前往「系统设置 → 隐私与安全性」，点击「仍要打开」。DMG 只包含 App 和 Applications 安装快捷方式，不会包含本机账号数据。
+
+#
+
 ### 欢迎提交 👉 <a href="https://github.com/xifandev/KimiCodeBar/issues">Issues</a> 反馈问题或建议
 
 #
