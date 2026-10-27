@@ -5,6 +5,10 @@ import Sparkle
 final class SparkleUpdater: ObservableObject {
     static let shared = SparkleUpdater()
 
+    static var isEnabled: Bool {
+        Bundle.main.object(forInfoDictionaryKey: "SUEnableAutomaticChecks") as? Bool ?? false
+    }
+
     private let updaterController: SPUStandardUpdaterController
     private let delegate: UpdaterDelegate
 
@@ -20,7 +24,7 @@ final class SparkleUpdater: ObservableObject {
         let delegate = UpdaterDelegate()
         self.delegate = delegate
         self.updaterController = SPUStandardUpdaterController(
-            startingUpdater: true,
+            startingUpdater: Self.isEnabled,
             updaterDelegate: delegate,
             userDriverDelegate: nil
         )
@@ -32,6 +36,7 @@ final class SparkleUpdater: ObservableObject {
     /// 避免用户刚打开面板时 Sparkle 自动弹出更新窗口。
     /// 3 分钟内重复打开面板不会再次触发探测。
     func checkForUpdateInformation() {
+        guard Self.isEnabled else { return }
         if let last = lastCheckDate, Date().timeIntervalSince(last) < minCheckInterval {
             return
         }
@@ -41,6 +46,7 @@ final class SparkleUpdater: ObservableObject {
 
     /// 弹出 Sparkle 标准更新窗口（含更新日志、进度条、立即更新/稍后/跳过）
     func showStandardUpdateUI() {
+        guard Self.isEnabled else { return }
         // 先把本 App 提到最前，避免菜单栏面板关闭后 Sparkle 弹窗落到 Safari 等其它窗口底下
         NSApplication.shared.activate(ignoringOtherApps: true)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
@@ -50,6 +56,7 @@ final class SparkleUpdater: ObservableObject {
 
     /// 调用 Sparkle 立即安装并重启
     func restartToInstallUpdate() {
+        guard Self.isEnabled else { return }
         delegate.installUpdateBlock?()
     }
 

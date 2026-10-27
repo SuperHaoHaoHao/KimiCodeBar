@@ -6984,6 +6984,7 @@ final class KimiCodeBarModel: ObservableObject {
     }
 
     func checkForAppUpdate() async {
+        guard SparkleUpdater.isEnabled else { return }
         guard let latest = await fetchLatestVersionFromAppcast() else { return }
 
         let current = normalizeVersion(appVersion())
