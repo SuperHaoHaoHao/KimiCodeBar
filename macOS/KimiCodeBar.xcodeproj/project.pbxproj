@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7B1CA15E00000000000000000000D1 /* QuotaRhythm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1CA15E00000000000000000000D2 /* QuotaRhythm.swift */; };
 		0C489D06D649421680AD66D7 /* KimiCodeBarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EF9AB1130A844A89CE0075C /* KimiCodeBarApp.swift */; };
 		145CD546D644400198EA5E79 /* DeepSeekBalanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2843BDA7749D4A188DD90B73 /* DeepSeekBalanceService.swift */; };
 		7B1CA15E0000000000D10001 /* WorkBuddyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1CA15E0000000000D10002 /* WorkBuddyService.swift */; };
@@ -29,6 +30,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7B1CA15E00000000000000000000D2 /* QuotaRhythm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaRhythm.swift; sourceTree = "<group>"; };
 		02F47923DD8C405BB3237AE1 /* KimiCodeBarQuotaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KimiCodeBarQuotaService.swift; sourceTree = "<group>"; };
 		2843BDA7749D4A188DD90B73 /* DeepSeekBalanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekBalanceService.swift; sourceTree = "<group>"; };
 		7B1CA15E0000000000D10002 /* WorkBuddyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkBuddyService.swift; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 			isa = PBXGroup;
 			children = (
 				2EF9AB1130A844A89CE0075C /* KimiCodeBarApp.swift */,
+				7B1CA15E00000000000000000000D2 /* QuotaRhythm.swift */,
 				528728E8E55940FC93765F944AFE050F /* SparkleUpdater.swift */,
 				7B1CA15E00000000000000000000A2 /* KimiLocalUsage.swift */,
 				2843BDA7749D4A188DD90B73 /* DeepSeekBalanceService.swift */,
@@ -200,6 +203,7 @@
 				7B1CA15E0000000000A00001 /* AntigravityOAuthService.swift in Sources */,
 				7B1CA15E0000000000A00003 /* AntigravityQuotaService.swift in Sources */,
 				0C489D06D649421680AD66D7 /* KimiCodeBarApp.swift in Sources */,
+				7B1CA15E00000000000000000000D1 /* QuotaRhythm.swift in Sources */,
 				4f9dbf90dffc49ad85242801801d170f /* KimiWebLaunchAgentManager.swift in Sources */,
 				FFAC0CE5E70E4F17AAD3B902 /* KimiCodeBarQuotaService.swift in Sources */,
 				71B3F9A2C4D84E5B0F1A6C8D /* KimiOAuthService.swift in Sources */,

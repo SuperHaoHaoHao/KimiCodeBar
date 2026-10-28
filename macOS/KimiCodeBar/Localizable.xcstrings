@@ -2228,7 +2228,15 @@
       }
     },
     "月" : {
-
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mo"
+          }
+        }
+      }
     },
     "月之亮面" : {
       "extractionState" : "stale",
@@ -3582,6 +3590,117 @@
           }
         }
       }
+    },
+    "本周使用节奏" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly Usage Rhythm"
+          }
+        }
+      }
+    },
+    "本周节奏" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly Rhythm"
+          }
+        }
+      }
+    },
+    "每日平均上限" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily Average Limit"
+          }
+        }
+      }
+    },
+    "周 14.3% / 天 · 月 3.3% / 天" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly 14.3% / day · Monthly 3.3% / day"
+          }
+        }
+      }
+    },
+    "日均 周 14.3% · 月 3.3%" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily avg · Weekly 14.3% · Monthly 3.3%"
+          }
+        }
+      }
+    },
+    "周日" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Sunday" } } }
+    },
+    "周一" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Monday" } } }
+    },
+    "周二" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Tuesday" } } }
+    },
+    "周三" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Wednesday" } } }
+    },
+    "周四" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Thursday" } } }
+    },
+    "周五" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Friday" } } }
+    },
+    "周六" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Saturday" } } }
+    },
+    "日" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Sun" } } }
+    },
+    "一" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Mon" } } }
+    },
+    "二" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Tue" } } }
+    },
+    "三" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Wed" } } }
+    },
+    "四" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Thu" } } }
+    },
+    "五" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Fri" } } }
+    },
+    "六" : {
+      "extractionState" : "stale",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Sat" } } }
     }
   },
   "version" : "1.0"
