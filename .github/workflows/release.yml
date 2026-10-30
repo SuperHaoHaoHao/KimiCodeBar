@@ -24,7 +24,11 @@ jobs:
       - name: Build Ad Hoc DMG
         run: ./scripts/build-local.sh "${GITHUB_REF_NAME}"
 
+      - name: Prepare Release Notes
+        run: awk '/^## / { count++; if (count == 2) exit } { print }' CHANGELOG.md > dist/release-notes.md
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          body_path: dist/release-notes.md
           files: dist/KimiCodeBar-*-macOS.dmg

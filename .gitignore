@@ -50,5 +50,8 @@ desktop.ini
 # WorkBuddy workspace data (project memory & notes, not source code)
 .workbuddy/
 
+# Local AI design drafts, diagnostics, and API captures
+.superpowers/
+
 # Local troubleshooting screenshots (auxiliary, not part of the repo)
 troubleshooting/
