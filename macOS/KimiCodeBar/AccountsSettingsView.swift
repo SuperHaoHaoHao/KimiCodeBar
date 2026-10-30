@@ -83,40 +83,50 @@ struct AccountsSettingsView: View {
                     LazyVStack(alignment: .leading, spacing: 12) {
                         ForEach(model.accounts) { account in
                             SettingsCard {
-                                AccountRow(
-                                    accountID: account.id,
-                                    draggingAccountID: $draggingAccountID,
-                                    displayName: model.displayName(for: account),
-                                    provider: account.provider,
-                                    phone: account.phone,
-                                    credential: account.credential,
-                                    isPrimary: account.id == model.primaryAccountID,
-                                    isCliActive: account.id == model.cliActiveAccountID,
-                                    state: model.accountStates[account.id] ?? .idle,
-                                    membershipLevel: model.accountQuotas[account.id]?.membershipLevel,
-                                    reauthorizeDisabled: model.oauthLoginInProgress,
-                                    onSwitchCli: { requestCliSwitch(account) },
-                                    onRename: {
-                                        renamingAccount = account
-                                        renamePhoneText = account.phone ?? ""
-                                        if let alias = account.alias?.trimmingCharacters(in: .whitespacesAndNewlines), !alias.isEmpty {
-                                            renameText = alias
-                                        } else {
-                                            renameText = model.displayName(for: account)
+                                VStack(spacing: 0) {
+                                    AccountRow(
+                                        accountID: account.id,
+                                        draggingAccountID: $draggingAccountID,
+                                        displayName: model.displayName(for: account),
+                                        provider: account.provider,
+                                        phone: account.phone,
+                                        credential: account.credential,
+                                        isPrimary: account.id == model.primaryAccountID,
+                                        isCliActive: account.id == model.cliActiveAccountID,
+                                        state: model.accountStates[account.id] ?? .idle,
+                                        membershipLevel: model.accountQuotas[account.id]?.membershipLevel,
+                                        reauthorizeDisabled: model.oauthLoginInProgress,
+                                        onSwitchCli: { requestCliSwitch(account) },
+                                        onRename: {
+                                            renamingAccount = account
+                                            renamePhoneText = account.phone ?? ""
+                                            if let alias = account.alias?.trimmingCharacters(in: .whitespacesAndNewlines), !alias.isEmpty {
+                                                renameText = alias
+                                            } else {
+                                                renameText = model.displayName(for: account)
+                                            }
+                                            showRenameAlert = true
+                                        },
+                                        onDelete: {
+                                            accountPendingDeletion = account
+                                            showDeleteConfirm = true
+                                        },
+                                        onReauthorize: { model.reauthorizeAccount(account.id) },
+                                        onEditKey: {
+                                            editingKeyAccount = account
+                                            editKeyInput = ""
+                                            showEditKeyAlert = true
                                         }
-                                        showRenameAlert = true
-                                    },
-                                    onDelete: {
-                                        accountPendingDeletion = account
-                                        showDeleteConfirm = true
-                                    },
-                                    onReauthorize: { model.reauthorizeAccount(account.id) },
-                                    onEditKey: {
-                                        editingKeyAccount = account
-                                        editKeyInput = ""
-                                        showEditKeyAlert = true
+                                    )
+
+                                    if account.provider == .kimi {
+                                        SettingsCardDivider()
+                                        AccountAuthorizationDetailsView(account: account) {
+                                            accountPendingDeletion = account
+                                            showDeleteConfirm = true
+                                        }
                                     }
-                                )
+                                }
                             }
                             // 拖拽中的源卡片降低透明度，突出「被抓走」的感觉
                             .opacity(draggingAccountID == account.id ? 0.35 : 1)

@@ -27,10 +27,14 @@
 		7B1CA15E0000000000A00003 /* AntigravityQuotaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1CA15E0000000000A00004 /* AntigravityQuotaService.swift */; };
 		FF4EC20D71184E45B29FFDB3C8BC6524 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 35A4DA7EE8214A199549CDB1B5E1C570 /* Sparkle */; };
 		FFAC0CE5E70E4F17AAD3B902 /* KimiCodeBarQuotaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02F47923DD8C405BB3237AE1 /* KimiCodeBarQuotaService.swift */; };
+		7B1CA15E00000000000000000000E1 /* KimiWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1CA15E00000000000000000000E2 /* KimiWebAuth.swift */; };
+		7B1CA15E00000000000000000000E3 /* KimiSubscriptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1CA15E00000000000000000000E4 /* KimiSubscriptionModels.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		7B1CA15E00000000000000000000D2 /* QuotaRhythm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaRhythm.swift; sourceTree = "<group>"; };
+		7B1CA15E00000000000000000000E2 /* KimiWebAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KimiWebAuth.swift; sourceTree = "<group>"; };
+		7B1CA15E00000000000000000000E4 /* KimiSubscriptionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KimiSubscriptionModels.swift; sourceTree = "<group>"; };
 		02F47923DD8C405BB3237AE1 /* KimiCodeBarQuotaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KimiCodeBarQuotaService.swift; sourceTree = "<group>"; };
 		2843BDA7749D4A188DD90B73 /* DeepSeekBalanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekBalanceService.swift; sourceTree = "<group>"; };
 		7B1CA15E0000000000D10002 /* WorkBuddyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkBuddyService.swift; sourceTree = "<group>"; };
@@ -107,6 +111,8 @@
 				7B1CA15E0000000000A00004 /* AntigravityQuotaService.swift */,
 				c68dac1893a64de08b00b18830c9deba /* KimiWebLaunchAgentManager.swift */,
 				02F47923DD8C405BB3237AE1 /* KimiCodeBarQuotaService.swift */,
+				7B1CA15E00000000000000000000E2 /* KimiWebAuth.swift */,
+				7B1CA15E00000000000000000000E4 /* KimiSubscriptionModels.swift */,
 				9E4D2C7B1A5F48E3B6D09A21 /* KimiOAuthService.swift */,
 				7B1CA15E00000000000000000000B2 /* KimiAccountStore.swift */,
 				7B1CA15E00000000000000000000C2 /* CliCredentialsService.swift */,
@@ -206,6 +212,8 @@
 				7B1CA15E00000000000000000000D1 /* QuotaRhythm.swift in Sources */,
 				4f9dbf90dffc49ad85242801801d170f /* KimiWebLaunchAgentManager.swift in Sources */,
 				FFAC0CE5E70E4F17AAD3B902 /* KimiCodeBarQuotaService.swift in Sources */,
+				7B1CA15E00000000000000000000E1 /* KimiWebAuth.swift in Sources */,
+				7B1CA15E00000000000000000000E3 /* KimiSubscriptionModels.swift in Sources */,
 				71B3F9A2C4D84E5B0F1A6C8D /* KimiOAuthService.swift in Sources */,
 				7B1CA15E00000000000000000000B1 /* KimiAccountStore.swift in Sources */,
 				7B1CA15E00000000000000000000C1 /* CliCredentialsService.swift in Sources */,

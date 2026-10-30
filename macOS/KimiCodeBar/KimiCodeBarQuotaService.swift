@@ -41,6 +41,8 @@ struct KimiQuota: Equatable {
     /// 服务端只下发 used_ratio（0~1 小数）与 reset_time，无绝对数值，
     /// 这里存成 used=百分比、limit=100 的 QuotaDetail 以复用现有展示逻辑。nil 表示未返回，UI 不展示。
     let monthly: QuotaDetail?
+    let monthlyKimiPercentage: Int?
+    let monthlyCodePercentage: Int?
     let membershipLevel: String?
     let boosterWallet: BoosterWallet?
     /// 账号唯一标识（user 对象中的 id/phone/email，取第一个非空值；都没有则为 nil）。
@@ -105,7 +107,7 @@ final class KimiCodeBarQuotaService {
 
     /// 查询配额。token 可以是 API Key（sk-kimi- 前缀）或 OAuth access token，
     /// 两者均以同样的 `Authorization: Bearer` 头携带，服务端不做区分。
-    func fetchQuota(token: String) async -> Result<KimiQuota, QuotaError> {
+    func fetchQuota(token: String, accountID: UUID? = nil) async -> Result<KimiQuota, QuotaError> {
         guard !token.isEmpty else {
             return .failure(.invalidKeyFormat)
         }
@@ -128,13 +130,119 @@ final class KimiCodeBarQuotaService {
                 return .failure(.httpError(statusCode: http.statusCode, message: message))
             }
 
-            guard let quota = parse(data) else {
+            let monthlyStats: (detail: QuotaDetail, kimiPercentage: Int?, codePercentage: Int?)?
+            if let accountID {
+                monthlyStats = try await fetchSubscriptionMonthly(accountID: accountID)
+            } else {
+                monthlyStats = nil
+            }
+            guard let quota = parse(data, monthlyStats: monthlyStats) else {
                 return .failure(.invalidResponse)
             }
             return .success(quota)
         } catch {
             return .failure(.networkError(error.localizedDescription))
         }
+    }
+
+    private func fetchSubscriptionMonthly(accountID: UUID) async throws
+        -> (detail: QuotaDetail, kimiPercentage: Int?, codePercentage: Int?)?
+    {
+        struct Response: Decodable {
+            struct Balance: Decodable {
+                let amountUsedRatio: Double?
+                let kimiCodeUsedRatio: Double?
+                let expireTime: String?
+
+                enum CodingKeys: String, CodingKey {
+                    case amountUsedRatio = "amount_used_ratio"
+                    case kimiCodeUsedRatio = "kimi_code_used_ratio"
+                    case expireTime = "expire_time"
+                    case amountUsedRatioCamel = "amountUsedRatio"
+                    case kimiCodeUsedRatioCamel = "kimiCodeUsedRatio"
+                    case expireTimeCamel = "expireTime"
+                }
+
+                init(from decoder: Decoder) throws {
+                    let container = try decoder.container(keyedBy: CodingKeys.self)
+                    amountUsedRatio = try container.decodeIfPresent(Double.self, forKey: .amountUsedRatio)
+                        ?? container.decodeIfPresent(Double.self, forKey: .amountUsedRatioCamel)
+                    kimiCodeUsedRatio = try container.decodeIfPresent(Double.self, forKey: .kimiCodeUsedRatio)
+                        ?? container.decodeIfPresent(Double.self, forKey: .kimiCodeUsedRatioCamel)
+                    expireTime = try container.decodeIfPresent(String.self, forKey: .expireTime)
+                        ?? container.decodeIfPresent(String.self, forKey: .expireTimeCamel)
+                }
+            }
+            let subscriptionBalance: Balance?
+
+            enum CodingKeys: String, CodingKey {
+                case subscriptionBalance = "subscription_balance"
+                case subscriptionBalanceCamel = "subscriptionBalance"
+            }
+
+            init(from decoder: Decoder) throws {
+                let container = try decoder.container(keyedBy: CodingKeys.self)
+                subscriptionBalance = try container.decodeIfPresent(Balance.self, forKey: .subscriptionBalance)
+                    ?? container.decodeIfPresent(Balance.self, forKey: .subscriptionBalanceCamel)
+            }
+        }
+
+        guard let token = await KimiWebAuthService.shared.accessToken(for: accountID) else {
+            return nil
+        }
+        do {
+            var result = try await requestSubscriptionStats(token: token)
+            if result.response.statusCode == 401 {
+                let refreshedToken = await KimiWebAuthService.shared.refreshAccessToken(for: accountID)
+                try Task.checkCancellation()
+                if let refreshedToken {
+                    result = try await requestSubscriptionStats(token: refreshedToken)
+                }
+            }
+            try Task.checkCancellation()
+
+            guard result.response.statusCode == 200,
+                  let stats = try? JSONDecoder().decode(Response.self, from: result.data),
+                  let balance = stats.subscriptionBalance,
+                  let totalRatio = balance.amountUsedRatio,
+                  let detail = makePercentDetail(usedRatio: totalRatio, resetTime: balance.expireTime) else {
+                return nil
+            }
+
+            let breakdown = KimiMonthlyQuotaCalculator.breakdown(
+                totalRatio: totalRatio,
+                codeRatio: balance.kimiCodeUsedRatio
+            )
+            return (
+                detail: detail,
+                kimiPercentage: breakdown?.kimiPercentage,
+                codePercentage: breakdown?.codePercentage
+            )
+        } catch let error as CancellationError {
+            throw error
+        } catch {
+            return nil
+        }
+    }
+
+    private func requestSubscriptionStats(token: String) async throws -> (data: Data, response: HTTPURLResponse) {
+        guard let url = URL(string: "https://www.kimi.com/apiv2/kimi.gateway.membership.v2.MembershipService/GetSubscriptionStats") else {
+            throw QuotaError.invalidURL
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("web", forHTTPHeaderField: "X-Msh-Platform")
+        request.httpBody = Data("{}".utf8)
+        request.timeoutInterval = 15
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw QuotaError.invalidResponse
+        }
+        return (data, http)
     }
 
     func fetchDisplayText(token: String) async -> String {
@@ -166,7 +274,22 @@ final class KimiCodeBarQuotaService {
         return nil
     }
 
-    private func parse(_ data: Data) -> KimiQuota? {
+    private func makePercentDetail(usedRatio: Double?, resetTime: String?) -> QuotaDetail? {
+        guard let usedRatio else { return nil }
+        let pct = max(0, min(100, Int((usedRatio * 100).rounded())))
+        return QuotaDetail(
+            used: pct,
+            limit: 100,
+            remaining: 100 - pct,
+            resetTime: parseDate(resetTime),
+            percentage: pct
+        )
+    }
+
+    private func parse(
+        _ data: Data,
+        monthlyStats: (detail: QuotaDetail, kimiPercentage: Int?, codePercentage: Int?)? = nil
+    ) -> KimiQuota? {
         struct Response: Codable {
             struct Usage: Codable {
                 let limit: String?
@@ -205,9 +328,7 @@ final class KimiCodeBarQuotaService {
                 let limit5h: RatioEntry?
                 let limit7d: RatioEntry?
                 let limitMonthTotal: RatioEntry?
-                // 月额度中 Kimi Code 消耗的部分（新会员体系下发）。当前 UI 只展示总额度
-                // limitMonthTotal（与 Kimi 网页/App 共用额度池，是真正会触顶的限额），
-                // 该字段暂仅解析保留，未消费。
+                // 月额度中 Kimi Code 消耗的子项，不参与月度总额回退。
                 let limitMonthCode: RatioEntry?
 
                 enum CodingKeys: String, CodingKey {
@@ -256,20 +377,6 @@ final class KimiCodeBarQuotaService {
             return nil
         }
 
-        // 新会员体系的按窗口用量汇总只下发 used_ratio（0~1 小数）+ reset_time，
-        // 换算为百分比存进 QuotaDetail（used=百分比、limit=100）以复用现有展示逻辑。
-        func makePercentDetail(usedRatio: Double?, resetTime: String?) -> QuotaDetail? {
-            guard let usedRatio else { return nil }
-            let pct = max(0, min(100, Int((usedRatio * 100).rounded())))
-            return QuotaDetail(
-                used: pct,
-                limit: 100,
-                remaining: 100 - pct,
-                resetTime: parseDate(resetTime),
-                percentage: pct
-            )
-        }
-
         // 周用量：老套餐走 usage 对象的绝对数值；新会员体系（月度计费套餐）没有 7 天窗口，
         // usage 与 usages.limit_7d 都不返回，此时 weekly 为 nil，UI 按字段有无动态展示。
         // usage 对象存在但字段全空（服务端可能返回空壳对象）时视为未下发，继续回退 limit_7d。
@@ -311,10 +418,11 @@ final class KimiCodeBarQuotaService {
             resetTime: nil
         )
 
-        // 月度总额度：后端未返回该字段（老计划可能不返回）时为 nil，UI 按字段有无动态展示。
-        let monthly = makePercentDetail(
-            usedRatio: resp.usages?.limitMonthTotal?.usedRatio,
-            resetTime: resp.usages?.limitMonthTotal?.resetTime
+        // 月度总额只使用订阅统计或 coding 的总额字段，Code 子项不能冒充总额。
+        let monthlyEntry = resp.usages?.limitMonthTotal
+        let monthly = monthlyStats?.detail ?? makePercentDetail(
+            usedRatio: monthlyEntry?.usedRatio,
+            resetTime: monthlyEntry?.resetTime
         )
 
         let membershipLevel = resp.user?.membership?.level
@@ -358,6 +466,8 @@ final class KimiCodeBarQuotaService {
             fiveHour: fiveHour,
             totalQuota: totalQuota,
             monthly: monthly,
+            monthlyKimiPercentage: monthlyStats?.kimiPercentage,
+            monthlyCodePercentage: monthlyStats?.codePercentage,
             membershipLevel: membershipLevel,
             boosterWallet: boosterWallet,
             userIdentifier: [resp.user?.id?.value, resp.user?.phone?.value, resp.user?.email?.value]
