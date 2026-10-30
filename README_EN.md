@@ -2,7 +2,7 @@
   <img src="Assets/logo.gif" width="55" alt="KimiCodeBar Logo" align="absmiddle">&nbsp;&nbsp;KimiCodeBar Custom Edition
 </h1>
 <p align="left">
-  <a href="https://github.com/SuperHaoHaoHao/KimiCodeBar/releases"><img src="https://img.shields.io/badge/version-1.7.2-333333" alt="Version"></a>
+  <a href="https://github.com/SuperHaoHaoHao/KimiCodeBar/releases"><img src="https://img.shields.io/badge/version-1.8.0-333333" alt="Version"></a>
  <img src="https://img.shields.io/badge/macOS-333333?logo=apple&logoColor=white" alt="macOS">
   <img src="https://img.shields.io/badge/-Independent%20Custom%20Edition-orange" alt="Independent Custom Edition">
   <a href="LICENSE"><img src="https://img.shields.io/github/license/SuperHaoHaoHao/KimiCodeBar" alt="License"></a>
@@ -36,6 +36,8 @@ The original project is a lightweight menu-bar usage monitor for Kimi Code. This
 ## Current Customizations
 
 - Preserve the original menu-bar quota monitoring, multi-account support, usage statistics, skill management, and visual style.
+- Add QR authorization for monthly subscriptions, unified monthly/weekly/5-hour quotas, and a Kimi/Code monthly usage breakdown.
+- Add an 8-day weekly rhythm, daily average limits, today's remaining quota in the menu bar, and exact reset dates.
 - Support Xcode development, Ad Hoc signing, and DMG packaging without a paid Apple Developer certificate.
 - Build and publish customized DMG installers through this repository's GitHub Actions for personal and internal team use.
 - Disable upstream automatic updates so future features evolve independently of the original author's releases.

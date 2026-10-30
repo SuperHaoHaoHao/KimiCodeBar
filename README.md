@@ -2,7 +2,7 @@
   <img src="Assets/logo.gif" width="55" alt="KimiCodeBar Logo" align="absmiddle">&nbsp;&nbsp;KimiCodeBar 定制版
 </h1>
 <p align="left">
-  <a href="https://github.com/SuperHaoHaoHao/KimiCodeBar/releases"><img src="https://img.shields.io/badge/version-1.7.2-333333" alt="Version"></a>
+  <a href="https://github.com/SuperHaoHaoHao/KimiCodeBar/releases"><img src="https://img.shields.io/badge/version-1.8.0-333333" alt="Version"></a>
  <img src="https://img.shields.io/badge/macOS-333333?logo=apple&logoColor=white" alt="macOS">
   <img src="https://img.shields.io/badge/-%E7%8B%AC%E7%AB%8B%E5%AE%9A%E5%88%B6%E7%89%88-orange" alt="独立定制版">
   <a href="LICENSE"><img src="https://img.shields.io/github/license/SuperHaoHaoHao/KimiCodeBar" alt="License"></a>
@@ -36,6 +36,8 @@
 ## 当前定制内容
 
 - 保留原项目的菜单栏配额监控、多账号、用量统计、技能管理等功能与界面风格。
+- 新增月度订阅扫码授权，统一展示月、周、5 小时用量及 Kimi / Code 月度用量构成。
+- 新增本周 8 天使用节奏、每日平均上限、菜单栏今日余量和具体重置日期。
 - 支持无付费 Apple Developer 证书的 Xcode 本地开发、Ad Hoc 签名与 DMG 打包。
 - 支持通过本仓库 GitHub Actions 构建并发布定制版 DMG，方便个人及同事内部使用。
 - 停用上游自动更新，后续功能由本仓库独立迭代，不随原作者版本自动变化。
