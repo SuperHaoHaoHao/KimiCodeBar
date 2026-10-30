@@ -16,6 +16,9 @@
     "·" : {
 
     },
+    "(%)" : {
+
+    },
     "/" : {
 
     },
@@ -60,6 +63,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ credits"
+          }
+        }
+      }
+    },
+    "%@%@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@%2$@"
           }
         }
       }
@@ -125,6 +138,9 @@
     "%lld%%" : {
 
     },
+    "≤%@%%" : {
+
+    },
     "✨" : {
 
     },
@@ -163,9 +179,6 @@
           }
         }
       }
-    },
-    "7D" : {
-
     },
     "7天" : {
       "extractionState" : "stale",
@@ -385,6 +398,17 @@
         }
       }
     },
+    "Kimi Code 登录" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kimi Code Login"
+          }
+        }
+      }
+    },
     "Kimi Web" : {
 
     },
@@ -588,6 +612,17 @@
         }
       }
     },
+    "一" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mon"
+          }
+        }
+      }
+    },
     "一个月以后" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -617,6 +652,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 Day"
+          }
+        }
+      }
+    },
+    "三" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wed"
           }
         }
       }
@@ -665,6 +711,17 @@
         }
       }
     },
+    "为该账号设置便于区分的别名和备注手机号，手机号可留空。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set an alias and phone number to tell accounts apart. Phone is optional."
+          }
+        }
+      }
+    },
     "主账号" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -672,6 +729,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Primary"
+          }
+        }
+      }
+    },
+    "二" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tue"
+          }
+        }
+      }
+    },
+    "二维码已过期，请重新生成" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR code expired. Generate a new one."
+          }
+        }
+      }
+    },
+    "五" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fri"
           }
         }
       }
@@ -694,6 +784,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Token Used Today"
+          }
+        }
+      }
+    },
+    "今日未签到" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not checked in today"
           }
         }
       }
@@ -738,6 +839,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sessions"
+          }
+        }
+      }
+    },
+    "余量 = 今日累计上限 - 当前用量；月度更紧张时显示月口径" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remaining = today's cumulative limit - current usage; monthly basis is shown when it is more constrained"
           }
         }
       }
@@ -870,6 +982,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "All"
+          }
+        }
+      }
+    },
+    "六" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sat"
           }
         }
       }
@@ -1292,6 +1415,17 @@
         }
       }
     },
+    "周 14.3% / 天 · 月 3.3% / 天" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly 14.3% / day · Monthly 3.3% / day"
+          }
+        }
+      }
+    },
     "周%1$d%% 5h %2$d%%" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1299,6 +1433,105 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "W %1$d%% · 5H %2$d%%"
+          }
+        }
+      }
+    },
+    "周一" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monday"
+          }
+        }
+      }
+    },
+    "周三" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wednesday"
+          }
+        }
+      }
+    },
+    "周二" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tuesday"
+          }
+        }
+      }
+    },
+    "周五" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Friday"
+          }
+        }
+      }
+    },
+    "周今日余量：%1$d%% - %2$d%% = %3$@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today's weekly remaining: %1$d%% - %2$d%% = %3$@"
+          }
+        }
+      }
+    },
+    "周六" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saturday"
+          }
+        }
+      }
+    },
+    "周四" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thursday"
+          }
+        }
+      }
+    },
+    "周日" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunday"
+          }
+        }
+      }
+    },
+    "四" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thu"
           }
         }
       }
@@ -1523,6 +1756,17 @@
         }
       }
     },
+    "尚未授权" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not authorized"
+          }
+        }
+      }
+    },
     "已停止" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1567,6 +1811,17 @@
         }
       }
     },
+    "已复制到剪贴板" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied to clipboard"
+          }
+        }
+      }
+    },
     "已归档" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1589,6 +1844,28 @@
         }
       }
     },
+    "已扫码，请在手机上确认" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanned. Confirm on your phone."
+          }
+        }
+      }
+    },
+    "已授权" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authorized"
+          }
+        }
+      }
+    },
     "已授权 Kimi 账号" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1607,6 +1884,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Checked in"
+          }
+        }
+      }
+    },
+    "已过期" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expired"
           }
         }
       }
@@ -1754,6 +2042,17 @@
         }
       }
     },
+    "手机号" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phone"
+          }
+        }
+      }
+    },
     "打开" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1783,6 +2082,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Authorization Page"
+          }
+        }
+      }
+    },
+    "扫码授权" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan to Authorize"
+          }
+        }
+      }
+    },
+    "扫码超时，请重新生成" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan timed out. Generate a new QR code."
           }
         }
       }
@@ -1831,6 +2152,17 @@
         }
       }
     },
+    "授权到期 %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expires at %@"
+          }
+        }
+      }
+    },
     "授权已失效，请重新登录" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1838,6 +2170,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Authorization is no longer valid. Please sign in again."
+          }
+        }
+      }
+    },
+    "授权成功" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authorized"
+          }
+        }
+      }
+    },
+    "授权时间 %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authorized at %@"
           }
         }
       }
@@ -2062,6 +2416,28 @@
         }
       }
     },
+    "日" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sun"
+          }
+        }
+      }
+    },
+    "日均 周 14.3% · 月 3.3%" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily avg · Weekly 14.3% · Monthly 3.3%"
+          }
+        }
+      }
+    },
     "日志接口请求失败：%@" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2260,6 +2636,17 @@
         }
       }
     },
+    "月今日余量：%1$d%% - %2$d%% = %3$@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today's monthly remaining: %1$d%% - %2$d%% = %3$@"
+          }
+        }
+      }
+    },
     "服务未运行" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2348,6 +2735,17 @@
         }
       }
     },
+    "本周使用节奏" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly Usage Rhythm"
+          }
+        }
+      }
+    },
     "本周用量" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2355,6 +2753,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Weekly Usage"
+          }
+        }
+      }
+    },
+    "本周节奏" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly Rhythm"
           }
         }
       }
@@ -2377,6 +2786,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Monthly Usage"
+          }
+        }
+      }
+    },
+    "月度用量构成" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monthly Usage Breakdown"
           }
         }
       }
@@ -2535,6 +2955,17 @@
         }
       }
     },
+    "正在生成二维码…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generating QR code…"
+          }
+        }
+      }
+    },
     "每一个 PR 都欢迎，期待在这里看到你的名字" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2542,6 +2973,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Every PR is welcome. We hope to see your name here."
+          }
+        }
+      }
+    },
+    "每日平均上限" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily Average Limit"
           }
         }
       }
@@ -2630,6 +3072,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Click the button below to open Google authorization in your default browser. The Antigravity account will be added automatically once authorized."
+          }
+        }
+      }
+    },
+    "点击复制手机号" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click to copy phone number"
           }
         }
       }
@@ -2942,6 +3395,61 @@
         }
       }
     },
+    "网页凭证已保存" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web credentials saved"
+          }
+        }
+      }
+    },
+    "网页扫码授权后显示" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Available after QR code authorization"
+          }
+        }
+      }
+    },
+    "网页授权响应无效" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid web authorization response"
+          }
+        }
+      }
+    },
+    "网页授权请求失败（%d）" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web authorization request failed (%d)"
+          }
+        }
+      }
+    },
+    "网页额度授权" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web Quota Authorization"
+          }
+        }
+      }
+    },
     "自动归档" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2971,6 +3479,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Menu Bar Style"
+          }
+        }
+      }
+    },
+    "订阅" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscription"
           }
         }
       }
@@ -3048,6 +3567,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Language"
+          }
+        }
+      }
+    },
+    "请使用 Kimi App 扫码" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan with the Kimi app"
           }
         }
       }
@@ -3426,6 +3956,17 @@
         }
       }
     },
+    "重新生成" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regenerate"
+          }
+        }
+      }
+    },
     "量身定制" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3514,6 +4055,61 @@
         }
       }
     },
+    "5时" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5H"
+          }
+        }
+      }
+    },
+    "已授权，月度数据暂不可用" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authorized. Monthly data is temporarily unavailable"
+          }
+        }
+      }
+    },
+    "请使用同一 Kimi 账号扫码" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan with the same Kimi account"
+          }
+        }
+      }
+    },
+    "订阅授权" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscription Authorization"
+          }
+        }
+      }
+    },
+    "重新扫码" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan Again"
+          }
+        }
+      }
+    },
     "默认样式" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3524,183 +4120,6 @@
           }
         }
       }
-    },
-    "为该账号设置便于区分的别名和备注手机号，手机号可留空。" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Set an alias and phone number to tell accounts apart. Phone is optional."
-          }
-        }
-      }
-    },
-    "已复制" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copied"
-          }
-        }
-      }
-    },
-    "手机号" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Phone"
-          }
-        }
-      }
-    },
-    "点击复制手机号" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Click to copy phone number"
-          }
-        }
-      }
-    },
-    "已复制到剪贴板" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copied to clipboard"
-          }
-        }
-      }
-    },
-    "今日未签到" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Not checked in today"
-          }
-        }
-      }
-    },
-    "本周使用节奏" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weekly Usage Rhythm"
-          }
-        }
-      }
-    },
-    "本周节奏" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weekly Rhythm"
-          }
-        }
-      }
-    },
-    "每日平均上限" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Daily Average Limit"
-          }
-        }
-      }
-    },
-    "周 14.3% / 天 · 月 3.3% / 天" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weekly 14.3% / day · Monthly 3.3% / day"
-          }
-        }
-      }
-    },
-    "日均 周 14.3% · 月 3.3%" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Daily avg · Weekly 14.3% · Monthly 3.3%"
-          }
-        }
-      }
-    },
-    "周日" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Sunday" } } }
-    },
-    "周一" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Monday" } } }
-    },
-    "周二" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Tuesday" } } }
-    },
-    "周三" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Wednesday" } } }
-    },
-    "周四" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Thursday" } } }
-    },
-    "周五" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Friday" } } }
-    },
-    "周六" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Saturday" } } }
-    },
-    "日" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Sun" } } }
-    },
-    "一" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Mon" } } }
-    },
-    "二" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Tue" } } }
-    },
-    "三" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Wed" } } }
-    },
-    "四" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Thu" } } }
-    },
-    "五" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Fri" } } }
-    },
-    "六" : {
-      "extractionState" : "stale",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Sat" } } }
     }
   },
   "version" : "1.0"

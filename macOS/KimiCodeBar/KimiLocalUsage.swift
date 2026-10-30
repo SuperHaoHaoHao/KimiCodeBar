@@ -316,6 +316,8 @@ struct LocalUsageCard: View {
     @StateObject private var service = KimiLocalUsageService.shared
     @StateObject private var languageManager = LanguageManager.shared
     @AppStorage("localUsageRange") private var rangeRaw: String = LocalUsageRange.all.rawValue
+    @AppStorage("localUsageChartExpanded") private var isChartExpanded = true
+    @State private var isHeaderHovered = false
     @State private var hoveredDay: LocalUsageDay?
     @State private var hoveredSegment: LocalUsageRange?
     @State private var hoveredHourIndex: Int?
@@ -414,16 +416,20 @@ struct LocalUsageCard: View {
                 // 首次扫描：内容区整体骨架（大数字 + 图表），避免 0 值闪现
                 metricsSkeleton
                     .modifier(SkeletonShimmer(phase: shimmerPhase))
-                chartSkeleton
-                    .modifier(SkeletonShimmer(phase: shimmerPhase))
-                    .onAppear {
-                        withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
-                            shimmerPhase = 1
+                if isChartExpanded {
+                    chartSkeleton
+                        .modifier(SkeletonShimmer(phase: shimmerPhase))
+                        .onAppear {
+                            withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
+                                shimmerPhase = 1
+                            }
                         }
-                    }
+                }
             } else {
                 metricsRow
-                chartArea
+                if isChartExpanded {
+                    chartArea
+                }
             }
         }
         .padding(14)
@@ -435,9 +441,22 @@ struct LocalUsageCard: View {
 
     private var headerRow: some View {
         HStack {
-            LText("Kimi Code 本机消耗量")
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(.kimiTextPrimary)
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isChartExpanded.toggle()
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: isChartExpanded ? "chevron.down" : "chevron.right")
+                        .font(.system(size: 10, weight: .semibold))
+                    LText("Kimi Code 本机消耗量")
+                        .font(.system(size: 13, weight: .medium))
+                }
+                .foregroundStyle(isHeaderHovered ? Color.kimiBlue : Color.kimiTextPrimary)
+            }
+            .buttonStyle(.plain)
+            .onHover { isHeaderHovered = $0 }
+            .cursor(.pointingHand)
 
             Spacer()
 

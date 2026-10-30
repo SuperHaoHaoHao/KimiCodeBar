@@ -215,7 +215,7 @@ struct KimiLabel: View {
                 scheme: model.menuBarDisplayScheme,
                 weekly: quota.weekly?.percentage,
                 fiveHour: quota.fiveHour.percentage,
-                weeklyLimit: QuotaRhythm.todayWeeklyLimit(for: quota)
+                remaining: QuotaRhythm.todayRemaining(for: quota)
             ))
         } else {
             Text(model.text)
@@ -226,7 +226,6 @@ struct KimiLabel: View {
 }
 
 private func percentageText(_ percentage: Int) -> String {
-    // 100% 时去掉数字和百分号之间的细空格，避免菜单栏宽度不够被截断
     percentage == 100 ? "\(percentage)%" : "\(percentage)\u{2009}%"
 }
 
@@ -289,16 +288,16 @@ enum MenuBarTextRenderer {
     private static let textColor = Color.black
 
     /// weekly 为 nil 表示新会员体系（月度计费套餐）没有 7 天窗口，7D 行不渲染。
-    static func image(scheme: MenuBarDisplayScheme, weekly: Int?, fiveHour: Int, weeklyLimit: Int? = nil) -> NSImage {
+    static func image(scheme: MenuBarDisplayScheme, weekly: Int?, fiveHour: Int, remaining: QuotaTodayRemaining? = nil) -> NSImage {
         switch scheme {
         case .compact:
-            return compactImage(weekly: weekly, fiveHour: fiveHour, weeklyLimit: weeklyLimit)
+            return compactImage(weekly: weekly, fiveHour: fiveHour, remaining: remaining)
         case .kPrefix:
-            return prefixImage(prefix: "K", weekly: weekly, fiveHour: fiveHour, weeklyLimit: weeklyLimit)
+            return prefixImage(prefix: "K", weekly: weekly, fiveHour: fiveHour, remaining: remaining)
         case .kimiPrefix:
-            return prefixImage(prefix: "Kimi", weekly: weekly, fiveHour: fiveHour, weeklyLimit: weeklyLimit)
+            return prefixImage(prefix: "Kimi", weekly: weekly, fiveHour: fiveHour, remaining: remaining)
         case .singleLine:
-            return singleLineImage(weekly: weekly, fiveHour: fiveHour, weeklyLimit: weeklyLimit)
+            return singleLineImage(weekly: weekly, fiveHour: fiveHour, remaining: remaining)
         }
     }
 
@@ -367,31 +366,23 @@ enum MenuBarTextRenderer {
         return render(content)
     }
 
-    @ViewBuilder
-    private static func weeklyLimitText(_ limit: Int?, size: CGFloat = 9) -> some View {
-        if let limit {
-            Text("≤\(limit)%")
-                .font(.system(size: size, weight: .medium, design: .default))
-                .monospacedDigit()
-                .foregroundStyle(textColor.opacity(0.55))
-                .fixedSize()
-        }
+    private static func remainingPercentageText(weekly: Int, remaining: QuotaTodayRemaining?) -> String {
+        remaining.map { percentageText($0.value) } ?? percentageText(weekly)
     }
 
-    /// 默认双行保留 7D/5H，只在周用量后追加今日累计上限。
-    private static func compactImage(weekly: Int?, fiveHour: Int, weeklyLimit: Int?) -> NSImage {
+    /// 默认双行保留作者原有 7D/5H 排版，仅将 7D 数值替换为今日余量。
+    private static func compactImage(weekly: Int?, fiveHour: Int, remaining: QuotaTodayRemaining?) -> NSImage {
         let content = VStack(alignment: .trailing, spacing: -1) {
             if let weekly {
-                HStack(spacing: 3) {
-                    Text("7D")
+                HStack(spacing: 2) {
+                    Text(remaining?.menuLabel ?? "7D")
                         .font(.system(size: 10, weight: .medium, design: .default))
                         .monospacedDigit()
                         .frame(width: 16, alignment: .leading)
-                    Text(percentageText(weekly))
-                        .font(percentageFont(for: weekly))
+                    Text(remainingPercentageText(weekly: weekly, remaining: remaining))
+                        .font(percentageFont(for: remaining?.value ?? weekly))
                         .monospacedDigit()
                         .frame(width: 30, alignment: .trailing)
-                    weeklyLimitText(weeklyLimit)
                 }
             }
             HStack(spacing: 2) {
@@ -413,7 +404,7 @@ enum MenuBarTextRenderer {
     }
 
     /// 前缀样式：K / Kimi 作为左侧大字号前缀，右侧上下两行百分比。
-    private static func prefixImage(prefix: String, weekly: Int?, fiveHour: Int, weeklyLimit: Int?) -> NSImage {
+    private static func prefixImage(prefix: String, weekly: Int?, fiveHour: Int, remaining: QuotaTodayRemaining?) -> NSImage {
         let prefixWidth: CGFloat = prefix == "K" ? 14 : 38
 
         let content = HStack(alignment: .center, spacing: 3) {
@@ -424,13 +415,10 @@ enum MenuBarTextRenderer {
 
             VStack(alignment: .trailing, spacing: 0) {
                 if let weekly {
-                    HStack(spacing: 3) {
-                        Text(percentageText(weekly))
-                            .font(percentageFont(for: weekly))
-                            .monospacedDigit()
-                            .frame(width: 30, alignment: .trailing)
-                        weeklyLimitText(weeklyLimit)
-                    }
+                    Text(remainingPercentageText(weekly: weekly, remaining: remaining))
+                        .font(percentageFont(for: remaining?.value ?? weekly))
+                        .monospacedDigit()
+                        .frame(width: 30, alignment: .trailing)
                 }
                 Text(percentageText(fiveHour))
                     .font(percentageFont(for: fiveHour))
@@ -445,16 +433,15 @@ enum MenuBarTextRenderer {
         return render(content)
     }
 
-    /// 单行样式：Kimi 84% ≤57% · 6%；无 7 天窗口时从 5h 开始。
-    private static func singleLineImage(weekly: Int?, fiveHour: Int, weeklyLimit: Int?) -> NSImage {
+    /// 单行样式：Kimi 84% · 6%；无 7 天窗口时从 5h 开始。
+    private static func singleLineImage(weekly: Int?, fiveHour: Int, remaining: QuotaTodayRemaining?) -> NSImage {
         let content = HStack(spacing: 4) {
             Text("Kimi")
                 .font(.system(size: 12, weight: .bold, design: .default))
             if let weekly {
-                Text(percentageText(weekly))
+                Text(remainingPercentageText(weekly: weekly, remaining: remaining))
                     .font(.system(size: 12, weight: .medium, design: .default))
                     .monospacedDigit()
-                weeklyLimitText(weeklyLimit, size: 10)
                 Text("·")
                     .font(.system(size: 12, weight: .medium))
             }
@@ -1061,13 +1048,14 @@ struct KimiMenu: View {
                 }
             )
         default:
-            // Kimi 主账号 / 未配置账号：保持现状，打开 Kimi 控制台
-            ActionButton(
-                title: languageManager.tr("控制台"),
-                textIcon: "KIMI",
-                action: {
+            KimiConsoleSplitButton(
+                onOpenOriginal: {
                     dismissMenuBarPanel()
                     NSWorkspace.shared.open(consoleURL)
+                },
+                onOpenSubscription: {
+                    dismissMenuBarPanel()
+                    NSWorkspace.shared.open(URL(string: "https://www.kimi.com/settings/subscription")!)
                 }
             )
         }
@@ -1131,20 +1119,24 @@ struct KimiMenu: View {
             // 操作按钮卡片
             HStack(spacing: 8) {
                 consoleButton
+                    .frame(width: 108)
 
                 ActionButton(
                     title: languageManager.tr("刷新"),
                     icon: "arrow.clockwise",
                     detail: model.lastSuccessfulRefreshText,
+                    horizontalTitle: true,
                     action: { model.refreshAll() },
                     disabled: !model.hasCredential || model.isLoading
                 )
+                .frame(width: 76)
 
                 ActionButton(
                     title: languageManager.tr("设置"),
                     icon: "gearshape",
                     action: { SettingsWindowManager.shared.show() }
                 )
+                .frame(width: 46)
                 .keyboardShortcut(",", modifiers: .command)
 
                 ActionButton(
@@ -1152,6 +1144,7 @@ struct KimiMenu: View {
                     icon: "power",
                     action: { NSApplication.shared.terminate(nil) }
                 )
+                .frame(width: 46)
             }
 
             // KimiCode CLI 版本行：仅 Kimi 平台时显示；检测到新版本时无视设置强制显示
@@ -1420,85 +1413,6 @@ struct LoginOverlayView: View {
             .cursor(.pointingHand)
             .onHover { isHoveredCancel = $0 }
         }
-    }
-}
-
-// MARK: - 用量卡片
-
-struct UsageCard: View {
-    let title: String
-    let subtitle: String?
-    let percentage: Int
-    let reset: String
-    let color: Color
-    let isLoading: Bool
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // 标题行
-            HStack {
-                Text(title)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.kimiTextPrimary)
-
-                Spacer()
-
-                if let subtitle = subtitle, !subtitle.isEmpty {
-                    Text(subtitle)
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(.kimiTextTertiary)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.kimiTextPrimary.opacity(0.08))
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
-                }
-            }
-
-            // 数值
-            ZStack(alignment: .leading) {
-                if !isLoading {
-                    Text("\(percentage)%")
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .monospacedDigit()
-                        .foregroundStyle(.kimiTextPrimary)
-                        .transition(.opacity.animation(.easeInOut(duration: 0.25)))
-                }
-
-                if isLoading {
-                    LoadingRing()
-                        .frame(width: 24, height: 24)
-                        .transition(.opacity.animation(.easeInOut(duration: 0.15)))
-                }
-            }
-            .frame(height: 38)
-            .animation(.easeInOut(duration: 0.2), value: isLoading)
-
-            // 进度条
-            GeometryReader { proxy in
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .frame(height: 4)
-                        .foregroundStyle(Color.kimiTextPrimary.opacity(0.10))
-
-                    Capsule()
-                        .frame(width: proxy.size.width * CGFloat(min(percentage, 100)) / 100, height: 4)
-                        .foregroundStyle(color)
-                        .shadow(color: color.opacity(0.4), radius: 3, x: 0, y: 1)
-                }
-            }
-            .frame(height: 4)
-
-            // 重置时间
-            Text(reset)
-                .font(.system(size: 11))
-                .foregroundStyle(.kimiTextSecondary)
-                .lineLimit(2)
-                .frame(maxWidth: .infinity, minHeight: 27, alignment: .leading)
-        }
-        .padding(14)
-        .frame(maxWidth: .infinity)
-        .background(Color.kimiCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 
@@ -2239,39 +2153,15 @@ private struct SingleAccountQuotaCards: View {
             AccountUnauthorizedHint()
         } else {
             VStack(spacing: 8) {
-                // 本月、本周、5小时按周期从长到短排列；缺失的周期不占位。
-                HStack(spacing: 12) {
-                    if let monthly = quota?.monthly {
-                        UsageCard(
-                            title: languageManager.tr("本月用量"),
-                            subtitle: nil,
-                            percentage: monthly.percentage,
-                            reset: monthly.resetWithDateText,
-                            color: .green,
-                            isLoading: isLoadingState
-                        )
-                    }
-
-                    if quota == nil || quota?.weekly != nil {
-                        UsageCard(
-                            title: languageManager.tr("本周用量"),
-                            subtitle: nil,
-                            percentage: quota?.weekly?.percentage ?? 0,
-                            reset: quota?.weekly?.resetWithDateText ?? "--",
-                            color: .kimiBlue,
-                            isLoading: isLoadingState
-                        )
-                    }
-
-                    UsageCard(
-                        title: languageManager.tr("5小时用量"),
-                        subtitle: nil,
-                        percentage: quota?.fiveHour.percentage ?? 0,
-                        reset: quota?.fiveHour.timeUntilReset ?? "--",
-                        color: .orange,
-                        isLoading: isLoadingState
-                    )
+                if account.provider == .kimi, quota != nil, quota?.monthly == nil {
+                    MonthlyQuotaAuthorizationCard(accountID: account.id)
                 }
+
+                UnifiedQuotaCard(
+                    quota: quota,
+                    isLoading: isLoadingState,
+                    style: model.multiAccountCardStyle
+                )
 
                 // 加油包按官方后台开通状态自动显示：已开通才展示，未开通不占位
                 if quota?.boosterWallet?.isEnabled == true {
@@ -2287,7 +2177,7 @@ private struct SingleAccountQuotaCards: View {
 
 // MARK: - 多账号配额卡片
 
-/// 多账号：每个账号一张紧凑卡片。头部为账号名与标签，下方复刻单账号 UsageCard 的
+/// 多账号：每个账号一张紧凑卡片。头部为账号名与标签，下方复刻单账号 UnifiedQuotaCard 的
 /// 多列等宽布局（本月 / 本周 / 5小时，本月仅后端返回时展示），信息层级与尺寸全面压缩，
 /// 多账号时整组高度可控。
 private struct AccountQuotaCard: View {
@@ -2412,7 +2302,7 @@ private struct AccountQuotaCard: View {
 
                         CompactQuotaColumn(
                             title: languageManager.tr("5小时用量"),
-                            reset: quota?.fiveHour.timeUntilReset,
+                            reset: quota?.fiveHour.resetWithDateText,
                             percentage: quota?.fiveHour.percentage,
                             color: .orange,
                             isLoading: isLoadingState
@@ -2444,7 +2334,7 @@ private struct AccountQuotaCard: View {
 
                         MinimalQuotaRow(
                             label: "5时",
-                            reset: quota?.fiveHour.timeUntilReset,
+                            reset: quota?.fiveHour.resetWithDateText,
                             percentage: quota?.fiveHour.percentage,
                             color: .orange,
                             isLoading: isLoadingState
@@ -2480,7 +2370,7 @@ private struct AccountQuotaCard: View {
 
 // MARK: - 紧凑限额列
 
-/// 多账号卡片内的单列限额。视觉层级复刻单账号 UsageCard：小号标题在上，
+/// 多账号卡片内的单列限额。视觉层级复刻单账号 UnifiedQuotaCard：小号标题在上，
 /// 超大百分比做视觉主角（第一眼聚焦额度），下方细进度条与重置时间为次要信息。
 /// 相比单账号大卡片仅做尺寸收敛：标题 11pt、数值 24pt、进度条 4pt、重置时间 10pt。
 private struct CompactQuotaColumn: View {
@@ -3223,36 +3113,24 @@ struct ActionButton: View {
     var textIcon: String? = nil
     var imageIcon: String? = nil
     var detail: String? = nil
+    var horizontalTitle = false
     let action: () -> Void
     var disabled: Bool = false
     @State private var isHovered = false
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 6) {
-                if let imageIcon {
-                    Image(imageIcon)
-                        .resizable()
-                        .interpolation(.high)
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 18, height: 18)
-                } else if let textIcon {
-                    Text(textIcon)
-                        .font(.system(size: 14, weight: .bold))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .frame(width: 34, height: 18, alignment: .center)
-                        .multilineTextAlignment(.center)
-                } else if let icon {
-                    Image(systemName: icon)
-                        .font(.system(size: 16, weight: .medium))
-                        .frame(width: 18, height: 18, alignment: .center)
+            VStack(spacing: detail == nil ? 6 : 2) {
+                if horizontalTitle {
+                    HStack(spacing: 5) {
+                        iconContent
+                        Text(title)
+                            .font(.system(size: 11, weight: .medium))
+                    }
+                } else {
+                    iconContent
+                    titleContent
                 }
-
-                Text(title)
-                    .font(.system(size: 11, weight: .medium))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .multilineTextAlignment(.center)
 
                 if let detail {
                     Text(detail)
@@ -3262,8 +3140,9 @@ struct ActionButton: View {
                         .lineLimit(1)
                 }
             }
-            .frame(maxWidth: .infinity, minHeight: 76)
-            .padding(.vertical, 12)
+            .padding(.vertical, detail == nil ? 12 : 6)
+            .frame(maxWidth: .infinity)
+            .frame(height: 62)
             .foregroundStyle(disabled ? .kimiTextTertiary : (isHovered ? .kimiTextPrimary : .kimiTextSecondary))
             .background(isHovered && !disabled ? Color.kimiTextPrimary.opacity(0.10) : Color.kimiTextPrimary.opacity(0.06))
             .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -3274,6 +3153,35 @@ struct ActionButton: View {
         .onHover { hovering in
             isHovered = hovering
         }
+    }
+
+    @ViewBuilder
+    private var iconContent: some View {
+        if let imageIcon {
+            Image(imageIcon)
+                .resizable()
+                .interpolation(.high)
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 18, height: 18)
+        } else if let textIcon {
+            Text(textIcon)
+                .font(.system(size: 14, weight: .bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(width: 34, height: 18, alignment: .center)
+                .multilineTextAlignment(.center)
+        } else if let icon {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .medium))
+                .frame(width: 18, height: 18, alignment: .center)
+        }
+    }
+
+    private var titleContent: some View {
+        Text(title)
+            .font(.system(size: 11, weight: .medium))
+            .frame(maxWidth: .infinity, alignment: .center)
+            .multilineTextAlignment(.center)
     }
 }
 
@@ -4821,7 +4729,7 @@ struct PanelCustomSettingsView: View {
                                     scheme: model.menuBarDisplayScheme,
                                     weekly: quota.weekly?.percentage,
                                     fiveHour: quota.fiveHour.percentage,
-                                    weeklyLimit: QuotaRhythm.todayWeeklyLimit(for: quota)
+                                    remaining: QuotaRhythm.todayRemaining(for: quota)
                                 ))
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 10)
@@ -4833,6 +4741,23 @@ struct PanelCustomSettingsView: View {
                                     .font(.system(size: 12, weight: .medium, design: .rounded))
                                     .foregroundStyle(.secondary)
                             }
+                        }
+
+                        if let remaining = QuotaRhythm.todayRemaining(for: model.quota) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(languageManager.tr(
+                                    remaining.isMonthly
+                                        ? "月今日余量：%1$d%% - %2$d%% = %3$@"
+                                        : "周今日余量：%1$d%% - %2$d%% = %3$@",
+                                    arguments: [remaining.limit, remaining.used, remaining.signedText]
+                                ))
+                                LText("余量 = 今日累计上限 - 当前用量；月度更紧张时显示月口径")
+                            }
+                            .font(.system(size: 10))
+                            .foregroundStyle(.kimiTextTertiary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, 12)
                         }
                     }
                 }
@@ -5789,6 +5714,8 @@ final class KimiCodeBarModel: ObservableObject {
     /// 正在刷新配额时置 true，防止并发 refresh() 调用。
     /// Kimi 服务端每次刷新都会轮换 refresh_token，两次并发刷新会导致第二次被判定为 unauthorized。
     private var isRefreshing = false
+    private var needsRefresh = false
+    private var refreshGeneration = 0
 
     /// WorkBuddy 串行刷新（签到 + 积分）进行中时置 true，防止定时器与手动触发重叠。
     private var isRefreshingWorkBuddy = false
@@ -5851,14 +5778,27 @@ final class KimiCodeBarModel: ObservableObject {
     /// - Parameter showsLoading: 是否把 isLoading 置 true 触发 UI loading 态。
     ///   仅手动点「刷新」按钮时传 true；后台场景（启动、定时器、面板打开、
     ///   设置窗口 onAppear）一律传 false，避免界面无谓闪烁。
-    /// - Note: 正在刷新时直接跳过，避免并发刷新同一个 refresh_token 导致服务端轮换冲突。
+    /// - Note: 正在刷新时记录一次待刷新，当前任务结束后补跑，避免并发刷新同一个 refresh_token。
     ///   WorkBuddy 账号的签到 + 积分刷新也随此入口统一触发（内部有独立的重入保护）。
     func refresh(showsLoading: Bool = true) {
-        guard !isRefreshing else { return }
+        if isRefreshing {
+            needsRefresh = true
+            return
+        }
         isRefreshing = true
+        needsRefresh = false
         refreshCliActiveAccount()
         refreshAllAccounts(showsLoading: showsLoading)
         refreshWorkBuddyAccounts()
+    }
+
+    private func finishRefresh() {
+        isRefreshing = false
+        syncPrimaryCompat()
+        if needsRefresh {
+            needsRefresh = false
+            refresh(showsLoading: false)
+        }
     }
 
     /// 解析单个 OAuth 账号当前可用的 access token。
@@ -5965,6 +5905,7 @@ final class KimiCodeBarModel: ObservableObject {
             isLoading = true
         }
         errorMessage = nil
+        let generation = refreshGeneration
 
         let store = KimiAccountStore.shared
         // 同步磁盘最新状态（含其他 Bar 实例的写入）
@@ -5978,14 +5919,13 @@ final class KimiCodeBarModel: ObservableObject {
             if showsLoading {
                 isLoading = false
             }
-            isRefreshing = false
             accountQuotas = [:]
             accountBalances = [:]
             accountAntigravityQuotas = [:]
             accountStates = [:]
             accountWorkBuddyCredits = [:]
             accountCheckinDates = [:]
-            syncPrimaryCompat()
+            finishRefresh()
             return
         }
 
@@ -6024,7 +5964,7 @@ final class KimiCodeBarModel: ObservableObject {
                             guard let accessToken = token else {
                                 return (account.id, nil, nil)
                             }
-                            switch await self.service.fetchQuota(token: accessToken) {
+                            switch await self.service.fetchQuota(token: accessToken, accountID: account.id) {
                             case .success(let quota):
                                 return (account.id, .kimi(quota), nil)
                             case .failure(let error):
@@ -6074,6 +6014,13 @@ final class KimiCodeBarModel: ObservableObject {
             }
 
             await MainActor.run {
+                guard generation == self.refreshGeneration else {
+                    if showsLoading {
+                        self.isLoading = false
+                    }
+                    self.finishRefresh()
+                    return
+                }
                 for (id, result, error) in results {
                     // WorkBuddy 账号由 refreshWorkBuddyAccounts() 独立处理积分和状态，
                     // 此处跳过避免 (nil, nil) 被误判为 unauthorized（"登录失效"）
@@ -6083,6 +6030,10 @@ final class KimiCodeBarModel: ObservableObject {
                     if let result {
                         switch result {
                         case .kimi(let quota):
+                            if self.accounts.first(where: { $0.id == id })?.accountIdentifier == nil,
+                               let identifier = quota.userIdentifier {
+                                KimiAccountStore.shared.updateAccountIdentifier(id: id, identifier: identifier)
+                            }
                             self.accountQuotas[id] = quota
                             if id == self.primaryAccountID {
                                 self.lastSuccessfulRefresh = Date()
@@ -6124,8 +6075,7 @@ final class KimiCodeBarModel: ObservableObject {
                 if showsLoading {
                     self.isLoading = false
                 }
-                self.isRefreshing = false
-                self.syncPrimaryCompat()
+                self.finishRefresh()
             }
         }
     }
@@ -6297,6 +6247,7 @@ final class KimiCodeBarModel: ObservableObject {
         let wasPrimary = (primaryAccountID == id)
 
         store.removeAccount(id: id)
+        KimiWebAuthService.shared.removeCredential(for: id)
         let remaining = store.snapshot.accounts
         if wasPrimary, let removedIndex, remaining.indices.contains(removedIndex) {
             store.setPrimaryAccount(remaining[removedIndex].id)
@@ -6312,6 +6263,41 @@ final class KimiCodeBarModel: ObservableObject {
         accountStates.removeValue(forKey: id)
         accountWorkBuddyCredits.removeValue(forKey: id)
         accountCheckinDates.removeValue(forKey: id)
+        syncPrimaryCompat()
+    }
+
+    func subscriptionAuthorizationDidChange(for id: UUID) {
+        refreshGeneration += 1
+        refresh(showsLoading: false)
+    }
+
+    func removeSubscriptionAuthorization(for id: UUID) {
+        refreshGeneration += 1
+        KimiWebAuthService.shared.removeCredential(for: id)
+        clearSubscriptionQuota(for: id)
+        refresh(showsLoading: false)
+    }
+
+    private func clearSubscriptionQuota(for id: UUID) {
+        guard let quota = accountQuotas[id] else { return }
+        accountQuotas[id] = KimiQuota(
+            weekly: quota.weekly,
+            fiveHour: quota.fiveHour,
+            totalQuota: quota.totalQuota,
+            monthly: nil,
+            monthlyKimiPercentage: nil,
+            monthlyCodePercentage: nil,
+            membershipLevel: quota.membershipLevel,
+            boosterWallet: quota.boosterWallet,
+            userIdentifier: quota.userIdentifier
+        )
+        syncPrimaryCompat()
+    }
+
+    private func resetAccountAfterIdentityChange(for id: UUID) {
+        refreshGeneration += 1
+        KimiWebAuthService.shared.removeCredential(for: id)
+        accountQuotas.removeValue(forKey: id)
         syncPrimaryCompat()
     }
 
@@ -6380,11 +6366,10 @@ final class KimiCodeBarModel: ObservableObject {
             }
             let store = KimiAccountStore.shared
             store.updateOAuthToken(id: id, token: token)
-            if let identifier {
-                store.updateAccountIdentifier(id: id, identifier: identifier)
-            }
+            store.updateAccountIdentifier(id: id, identifier: identifier)
             self.accounts = store.snapshot.accounts
             self.accountStates[id] = .idle
+            self.resetAccountAfterIdentityChange(for: id)
             self.refresh(showsLoading: false)
         }
     }
@@ -6485,11 +6470,10 @@ final class KimiCodeBarModel: ObservableObject {
             case .success(let quota):
                 let store = KimiAccountStore.shared
                 store.updateApiKey(id: id, key: trimmed)
-                if let identifier = quota.userIdentifier {
-                    store.updateAccountIdentifier(id: id, identifier: identifier)
-                }
+                store.updateAccountIdentifier(id: id, identifier: quota.userIdentifier)
                 accounts = store.snapshot.accounts
                 accountStates[id] = .idle
+                resetAccountAfterIdentityChange(for: id)
                 refresh(showsLoading: false)
                 return nil
             case .failure(let error):
